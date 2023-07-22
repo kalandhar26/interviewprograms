@@ -4,20 +4,20 @@ public class RemoveOccurances {
 
     public static void main(String[] args) {
 
-        System.out.println(removeOcuurances('c',"cloudtech"));
+        System.out.println(removeOccurrences('c',"cloudtech"));
 
     }
 
-    public static String removeOcuurances(Character ch,String str){
-        String result="";
+    public static String removeOccurrences(Character ch, String str){
+        StringBuilder result= new StringBuilder();
         for(int i=0;i<str.length();i++){
             if(str.charAt(i)==ch){
                continue;
             }else{
-                result = result+str.charAt(i);
+                result.append(str.charAt(i));
             }
         }
 
-        return result;
+        return result.toString();
     }
 }
