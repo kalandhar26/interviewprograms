@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class UstGlobalQuestions {
+public class DuplicateInString{
 
     private static List<Employee> employeeList = JavaEightQuestions.getEmployeeList();
 

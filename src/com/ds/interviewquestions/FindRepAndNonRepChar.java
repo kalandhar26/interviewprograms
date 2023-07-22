@@ -24,7 +24,7 @@ public class FindRepAndNonRepChar {
         List<Character> NonRepetitiveCharacters = input.chars().mapToObj(c -> (char) c).filter(c -> charCount.get(c) == 1).collect(Collectors.toList());
         System.out.println(NonRepetitiveCharacters.stream().findFirst().get());
 
-        // Another Way
+        // Another Way first Repeatative
 
         Character character = input.chars().mapToObj(c -> (char) c)
                 .collect(Collectors.groupingBy(c -> c, LinkedHashMap::new, Collectors.counting()))
@@ -32,6 +32,11 @@ public class FindRepAndNonRepChar {
 
         System.out.println(character);
 
+
+        // first Non Repeatative
+
+        Character character1 = input.chars().mapToObj(c -> (char) c).filter(c -> charCount.get(c) == 1).findFirst().get();
+        System.out.println(character1);
     }
 
 

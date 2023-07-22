@@ -187,12 +187,11 @@ public class JavaEightQuestions {
             return employee3;
         }).collect(Collectors.toList()).forEach(System.out::println);
 
-
         System.out.println("========================== Filter Employee who name starts with R and contains reddy ==========================");
         employeeList.stream().filter(s -> s.getName().toLowerCase().startsWith("r")).collect(Collectors.toList()).forEach(System.out::println);
         employeeList.stream().filter(s -> s.getName().toLowerCase().contains("reddy")).collect(Collectors.toList()).forEach(System.out::println);
 
-        System.out.println("========================== find Unique passout years ==========================");
+        System.out.println("========================== find Unique passout years in desc Order==========================");
         employeeList.stream().sorted(Comparator.comparingDouble(Employee::getPassedOutyear).reversed()).map(Employee::getPassedOutyear).distinct().collect(Collectors.toList()).forEach(System.out::println);
 
         System.out.println("========================== find dulicate passout years ==========================");
@@ -220,7 +219,6 @@ public class JavaEightQuestions {
         }
 
         // List Out all the hobbies
-
         System.out.println("============== Employees Hobbies =======================");
         List<String> collect18 = employeeList.stream().map(Employee::getHobbies).flatMap(List::stream).distinct().collect(Collectors.toList());
 

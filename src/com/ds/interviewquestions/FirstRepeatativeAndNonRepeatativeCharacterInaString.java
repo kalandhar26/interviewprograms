@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class JPMCQuestions {
+public class FirstRepeatativeAndNonRepeatativeCharacterInaString {
 
     public static void main(String[] args) {
         String input = "subscribetoInterviewmania";

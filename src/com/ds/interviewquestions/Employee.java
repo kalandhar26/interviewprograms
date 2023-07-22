@@ -22,6 +22,43 @@ public class Employee {
 
     private List<String> hobbies;
 
+    private List<Department> departments;
+
+    public Employee(int id, double salary, int deptid, String status, String name, int age, String gender, String department, List<String> hobbies, List<Department> departments, Address address, int passedOutyear) {
+        this.id = id;
+        this.salary = salary;
+        this.deptid = deptid;
+        this.status = status;
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        this.department = department;
+        this.hobbies = hobbies;
+        this.departments = departments;
+        this.address = address;
+        this.passedOutyear = passedOutyear;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id=" + id +
+                ", salary=" + salary +
+                ", deptid=" + deptid +
+                ", status='" + status + '\'' +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", gender='" + gender + '\'' +
+                ", department='" + department + '\'' +
+                ", hobbies=" + hobbies +
+                ", departments=" + departments +
+                ", address=" + address +
+                ", passedOutyear=" + passedOutyear +
+                '}';
+    }
+
+    private Address address;
 
     private int passedOutyear;
 
@@ -97,6 +134,22 @@ public class Employee {
         this.status = status;
     }
 
+    public List<Department> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(List<Department> departments) {
+        this.departments = departments;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
     public List<String> getHobbies() {
         return hobbies;
     }
@@ -112,11 +165,6 @@ public class Employee {
         this.department = department;
         this.hobbies = hobbies;
         this.passedOutyear = passedOutyear;
-    }
-
-    @Override
-    public String toString() {
-        return "Employee{" + "id=" + id + ", salary=" + salary + ", deptid=" + deptid + ", status='" + status + '\'' + ", name='" + name + '\'' + ", age=" + age + ", gender='" + gender + '\'' + ", department='" + department + '\'' + ", hobbies=" + hobbies + ", passedOutyear=" + passedOutyear + '}';
     }
 
     public void setHobbies(List<String> hobbies) {
