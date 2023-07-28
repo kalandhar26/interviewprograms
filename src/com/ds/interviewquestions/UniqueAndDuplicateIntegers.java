@@ -8,16 +8,16 @@ import java.util.stream.Collectors;
 public class UniqueAndDuplicateIntegers {
 
     public static void main(String[] args) {
-        List<Integer> numbers = Arrays.asList(1, 2, 3, 2, 4, 5, 3, 6, 7, 8, 7, 9);
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 2,2, 4, 5, 3, 6, 7, 8, 7, 9);
 
-        // Finding unique elements
+        // Remove Duplicates and Print them
         List<Integer> uniqueElements = numbers.stream()
                 .distinct()
                 .toList();
 
         System.out.println("Unique elements: " + uniqueElements);
 
-        // Finding duplicate elements
+        // Finding duplicates and Print them
         Map<Integer, Long> elementCountMap = numbers.stream()
                 .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
 
@@ -27,5 +27,13 @@ public class UniqueAndDuplicateIntegers {
                 .toList();
 
         System.out.println("Duplicate elements: " + duplicateElements);
+
+        // Print only unique numbers
+        List<Integer> uniqueNumbers = numbers.stream()
+                .filter(number -> elementCountMap.getOrDefault(number, 0L) == 1)
+                .toList();
+
+        System.out.println("Only Unique Numbers: " + uniqueNumbers);
     }
+
 }

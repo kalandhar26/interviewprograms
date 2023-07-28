@@ -9,7 +9,7 @@ public class AllSubStrings {
         String input = "BabaKalandhar";
         int n = input.length();
         List<String> subStrings = new ArrayList<>();
- 
+
         for(int i=0;i<n;i++){
             for(int j = i+1;j<=n;j++){
                 subStrings.add(input.substring(i,j));
