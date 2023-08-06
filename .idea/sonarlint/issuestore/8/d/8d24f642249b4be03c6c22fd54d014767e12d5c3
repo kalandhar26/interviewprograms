@@ -1,0 +1,7 @@
+
+S	java:S106"9Replace this use of System.out or System.err by a logger.(€§®¸ùÿÿÿÿ
+N	java:S106"9Replace this use of System.out or System.err by a logger.(›şˆÆ
+c	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Í§øÌ
+8
+java:S1659"#Declare "count" on a separate line.(ùùô?
+c	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÈšÓ

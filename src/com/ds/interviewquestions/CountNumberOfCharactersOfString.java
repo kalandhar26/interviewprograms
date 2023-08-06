@@ -1,4 +1,4 @@
-package com.ds.searching;
+package com.ds.interviewquestions;
 
 import java.util.HashMap;
 import java.util.Map;
