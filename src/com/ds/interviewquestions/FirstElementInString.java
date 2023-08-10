@@ -1,6 +1,6 @@
 package com.ds.interviewquestions;
 
-public class FirstElementinString {
+public class FirstElementInString {
 
     public static void main(String[] args) {
 
