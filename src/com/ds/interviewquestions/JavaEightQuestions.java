@@ -1,6 +1,7 @@
 package com.ds.interviewquestions;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class JavaEightQuestions {
@@ -226,6 +227,10 @@ public class JavaEightQuestions {
             System.out.println(list);
         }
 
+        // Count Age
+
+        double v = employeeList.stream().mapToDouble(Employee::getAge).sum();
+        System.out.println(v);
         // =====================  End  =============================
     }
 }

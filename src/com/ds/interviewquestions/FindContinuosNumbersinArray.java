@@ -1,8 +1,8 @@
-package com.ds.introduction;
+package com.ds.interviewquestions;
 
 import javax.sound.midi.Soundbank;
 
-public class Test1 {
+public class FindContinuosNumbersinArray {
 
     public static void main(String[] args) {
 

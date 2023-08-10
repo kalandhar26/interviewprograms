@@ -34,18 +34,38 @@ public class TraverseHashMap {
     }
 
     public static void way2(Map<Integer, String> map){
+        // EntrySet Iteration
+        for(Map.Entry<Integer,String> entry : map.entrySet()){
+            Integer key = entry.getKey();
+            String value = entry.getValue();
+            System.out.println(key+""+value);
+        }
 
     }
 
     public static void way3(Map<Integer, String> map){
-
+        for(Integer key : map.keySet()){
+            String value = map.get(key);
+        }
     }
 
     public static void way4(Map<Integer, String> map){
+        for(String value : map.values()){
 
+        }
     }
 
     public static void way5(Map<Integer, String> map){
+    map.entrySet().stream().forEach(entry -> {
+        Integer key = entry.getKey();
+        String value = entry.getValue();
+    });
+    }
 
+    public static void way6(Map<Integer, String> map){
+        map.entrySet().forEach(entry -> {
+            Integer key = entry.getKey();
+            String value = entry.getValue();
+        });
     }
 }
