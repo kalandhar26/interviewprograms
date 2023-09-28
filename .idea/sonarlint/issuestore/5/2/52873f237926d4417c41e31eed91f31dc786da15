@@ -1,0 +1,38 @@
+
+_
+java:S11921"IDefine a constant instead of duplicating this literal "InActive" 4 times.(ÀÈ÷
+]
+java:S11921"GDefine a constant instead of duplicating this literal "FEMALE" 6 times.(ÀÈ÷
+]
+java:S11920"GDefine a constant instead of duplicating this literal "Active" 5 times.(Ş£Îë
+N	java:S106S"9Replace this use of System.out or System.err by a logger.(€ø°ª
+Q
+java:S1611V"6Remove the parentheses around the "employee" parameter(®ºíÃúÿÿÿÿ
+S	java:S106V"9Replace this use of System.out or System.err by a logger.(®ºíÃúÿÿÿÿ
+N	java:S106X"9Replace this use of System.out or System.err by a logger.(îø˜«
+G
+java:S1602Z",Remove useless curly braces around statement(¾ŸËŞøÿÿÿÿ
+M	java:S106["9Replace this use of System.out or System.err by a logger.(¨ó™_
+N	java:S106^"9Replace this use of System.out or System.err by a logger.(êâ¬¯
+B
+java:S1602d",Remove useless curly braces around statement(òİ„¥
+M	java:S106e"9Replace this use of System.out or System.err by a logger.(¨ó™_
+B
+java:S1602l",Remove useless curly braces around statement(ÂîÒß
+M	java:S106m"9Replace this use of System.out or System.err by a logger.(¨ó™_
+S	java:S106p"9Replace this use of System.out or System.err by a logger.(†«òÿÿÿÿÿ
+S	java:S106r"9Replace this use of System.out or System.err by a logger.(–È¬Şıÿÿÿÿ
+S
+java:S1155u">Use isEmpty() to check whether the collection is empty or not.(–Áä4
+G
+java:S1602v",Remove useless curly braces around statement(°ï‘úÿÿÿÿ
+S	java:S106w"9Replace this use of System.out or System.err by a logger.(Ñ±Ëàøÿÿÿÿ
+Y
+java:S1155{">Use isEmpty() to check whether the collection is empty or not.(ÆœêÌıÿÿÿÿ
+G
+java:S1602|",Remove useless curly braces around statement(Åàáåÿÿÿÿÿ
+S	java:S106}"9Replace this use of System.out or System.err by a logger.(Ñ±Ëàøÿÿÿÿ
+O	java:S106€"9Replace this use of System.out or System.err by a logger.(ù»´
+H
+java:S1602‰",Remove useless curly braces around statement(ÈæòŠüÿÿÿÿ
+N	java:S106Š"9Replace this use of System.out or System.err by a logger.(¨ó™_

@@ -121,6 +121,12 @@ public class JavaEightQuestions {
         Employee highestpaidEmployee = employeeList.stream().max(Comparator.comparingDouble(Employee::getSalary)).get();
         System.out.println(highestpaidEmployee.toString());
 
+
+        System.out.println("=========================== 2nd Highest Paid Employee =============");
+        Optional<Employee> secondHighestpaidEmployee = employeeList.stream().sorted(Comparator.comparingDouble(Employee::getSalary)).skip(1).findFirst();
+        employeeList.stream().mapToDouble(Employee::getSalary).distinct().boxed().sorted(Double::compare).skip(1).findFirst();
+        System.out.println("2nd ====$%^"+secondHighestpaidEmployee.toString());
+
         System.out.println("=========================== Highest Paid Employee Gender wise =============");
 
         Map<String, Optional<Employee>> collect10 = employeeList.stream().collect(Collectors.groupingBy(Employee::getGender, Collectors.maxBy(Comparator.comparingDouble(Employee::getSalary))));

@@ -6,9 +6,9 @@ public class IndexOfFirstOccurance {
 
     public static void main(String[] args) {
 
-        int[] array = {5,10,10,15,15};
+        int[] array = {-20,-18,-16,-1,-1,-1,0,0,4,4,5,6,6,6,6,7,8,8,8,8,9,9,9,9,34,34,56,78};
 
-        System.out.println(firstOccuranceBSI(array, 15));
+        System.out.println(firstOccuranceBSI(array, 9    ));
         System.out.println(firstOccuranceBSR(array, 15, 0, 4));
 
     }
@@ -55,7 +55,7 @@ public class IndexOfFirstOccurance {
         return x;
     }
 
-    // Binary Search Recursive
+    // Binary Search Approach (Recursive)
 
     public static int firstOccuranceBSR(int[] array, int element, int low, int high) {
         Arrays.sort(array);
