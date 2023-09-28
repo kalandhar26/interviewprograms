@@ -1,4 +1,6 @@
-package com.java;
+package com.ds.interviewquestions;
+
+import com.java.ChildClass;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

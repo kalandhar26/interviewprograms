@@ -1,4 +1,4 @@
-package com.java;
+package com.ds.interviewquestions;
 
 public class MultiplyWithOtherElements {
 

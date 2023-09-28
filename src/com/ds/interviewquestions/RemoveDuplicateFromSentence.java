@@ -1,4 +1,4 @@
-package com.java;
+package com.ds.interviewquestions;
 
 import java.util.HashSet;
 import java.util.Set;

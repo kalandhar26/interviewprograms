@@ -31,8 +31,6 @@ g
 7src/com/ds/interviewquestions/FirstElementInString.java,1\8\18237e9d5f6c6585b016a7c3843c4bc3e3295a37
 d
 4src/com/ds/interviewquestions/AdvancedJavaEight.java,5\2\52873f237926d4417c41e31eed91f31dc786da15
-M
-src/com/java/ParentClass.java,9\c\9cfd4e881e8b68d548d5afba66e4beda9bf19e98
 O
 src/com/ds/Arrays/SubArray.java,d\b\db505b80a065929a0585b35bdfe3d99b3b310a70
 f
