@@ -50,4 +50,36 @@ public class MaximumOfSubArray {
         return  min_sum;
     }
 
+    // Max_Sum (index)
+    public static int[] maximumSumSubarrayIndices(int[] array) {
+        int n = array.length;
+        int max_sum = array[0];
+        int current_sum = array[0];
+        int start = 0;  // Start index of the current subarray with max sum
+        int startIndex = 0;  // Start index of the subarray with max sum
+        int endIndex = 0;    // End index of the subarray with max sum
+
+        for (int i = 1; i < n; i++) {
+            if (array[i] > current_sum + array[i]) {
+                // If the current element is greater than the current_sum + array[i],
+                // start a new subarray.
+                current_sum = array[i];
+                start = i;
+            } else {
+                // Extend the current subarray.
+                current_sum = current_sum + array[i];
+            }
+
+            if (current_sum > max_sum) {
+                // Update the max_sum and the corresponding indices.
+                max_sum = current_sum;
+                startIndex = start;
+                endIndex = i;
+            }
+        }
+
+        int[] result = new int[]{startIndex, endIndex};
+        return result;
+    }
+
 }

@@ -1,6 +1,0 @@
-
-N	java:S106)"9Replace this use of System.out or System.err by a logger.(ž¨³»
-S	java:S106*"9Replace this use of System.out or System.err by a logger.(ƒ¿Š¾ùÿÿÿÿ
-S	java:S106+"9Replace this use of System.out or System.err by a logger.(ƒÔÝÈþÿÿÿÿ
-F
-java:S1128"+Remove this unused import 'java.util.List'.(Õë±Äøÿÿÿÿ
