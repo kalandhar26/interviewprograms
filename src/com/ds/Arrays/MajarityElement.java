@@ -8,6 +8,11 @@ public class MajarityElement {
 
         System.out.println(majaorityElement(array));
 
+
+        int[] array2 = {2, 3, 4, 2, 5, 5, 2, 3, 2, 4, 6, 7, 8, 2, 7, 2, 4, 2, 1, 1};
+
+        System.out.println(majorityElement2(array2));
+
     }
 
     // My Own code
@@ -65,6 +70,25 @@ public class MajarityElement {
 
         return result;
 
+    }
 
+    public static int majorityElement2(int[] array) {
+        int count = 0;
+        int majorityElement = 0;
+        for (int i = 0; i < array.length; i++) {
+            if (count == 0) {
+                majorityElement = array[i];
+                count++;
+            } else if (majorityElement == array[i]) {
+                count++;
+            } else {
+                count--;
+                if (count == 0) {
+                    majorityElement = array[i];
+                }
+            }
+        }
+        return majorityElement;
     }
 }
+

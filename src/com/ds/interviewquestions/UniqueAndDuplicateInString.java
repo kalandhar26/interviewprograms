@@ -1,7 +1,9 @@
 package com.ds.interviewquestions;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -41,6 +43,24 @@ public class UniqueAndDuplicateInString {
         System.out.println(findDupliacteAndPrint);
         System.out.println(removeDupliacteAndPrint);
         System.out.println(findUniqueAndPrint);
+
+        // old way
+
+        Set<Character> unique = new HashSet<>();
+        Set<Character> duplicates = new HashSet<>();
+
+        for(int i = 0; i < inputString.length(); i++){
+            Character c = inputString.charAt(i);
+            if(!unique.contains(c)) {
+                unique.add(c);
+            }
+            else{
+                duplicates.add(c);
+            }
+        }
+
+        System.out.println(unique);
+        System.out.println(duplicates);
 
     }
 }

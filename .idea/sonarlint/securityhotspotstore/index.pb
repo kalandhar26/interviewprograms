@@ -5,8 +5,6 @@ l
 <src/com/ds/interviewquestions/CustomFunctionalInterface.java,0\0\00311f86d7fb6ecf687af810f8355e06ac8b6279
 u
 Esrc/com/ds/interviewquestions/ImplementCustomFunctionalInterafce.java,1\1\1124a522f8a97dd789aa47a19dfefd90eea577cb
-a
-1src/com/ds/interviewquestions/ImmutableClass.java,5\8\589c9aee113f9f4be82bc4fe7250f2f89ea2de1f
 r
 Bsrc/com/ds/interviewquestions/CountNumberOfCharactersOfString.java,a\7\a74dac3eaf373b9a2c79bff742c125d8e06224e7
 N
@@ -43,8 +41,6 @@ P
  src/com/ds/Arrays/FlatArray.java,0\0\00ff4c39eb83e7a9b80d69f4ca5979c0b49623d2
 _
 /src/com/ds/interviewquestions/AnagramCheck.java,e\f\ef9419efc662abe65bff524f11858fdc1c6963d6
-`
-0src/com/ds/interviewquestions/CommonCourese.java,d\f\dfdf8a962390cb72e731073cbaf1087018c303ac
 k
 ;src/com/ds/interviewquestions/RemoveAdjacentCharacters.java,d\5\d5e32df563de9f5e1446e140acdf4f1c0c4f0c47
 a
@@ -75,3 +71,23 @@ n
 >src/com/ds/interviewquestions/RemoveDuplicateFromSentence.java,2\a\2a48d70fb2d0398d01ffb8d88cffa43494fc2595
 L
 src/com/java/ChildClass.java,9\5\95833322ee163f957cf6eae4f4226c68a1c16d41
+F
+src/com/java/Test.java,c\2\c2c0a620c32ba9b6fbe1ed56673d966693d96e7d
+G
+src/com/java/Test1.java,2\f\2fd279a22082667c0254dd678bfd1ccf6abcab7e
+d
+4src/com/ds/interviewquestions/ImmutableEmployee.java,5\b\5b31923379414a3af856eac878f349715bfba8cd
+a
+1src/com/ds/interviewquestions/ImmutableClass.java,5\8\589c9aee113f9f4be82bc4fe7250f2f89ea2de1f
+`
+0src/com/ds/interviewquestions/CommonCourese.java,d\f\dfdf8a962390cb72e731073cbaf1087018c303ac
+c
+3src/com/ds/interviewquestions/RemoveOccurances.java,f\c\fc3e3ebae4b6550639289ae1113027bab64d09e2
+m
+=src/com/ds/interviewquestions/UniqueAndDuplicateInString.java,f\7\f7bf50c89df44d13b104e9483fded478020a214b
+N
+src/com/ds/faang/Powerof4.java,0\b\0bbb42236d8d93500cb100031f323145de3f242f
+\
+,src/com/ds/faang/SortArrayByBinaryDigit.java,1\a\1aafa9b0275d864ab72edea603a576cdc3536e03
+_
+/src/com/ds/interviewquestions/CommonCourse.java,4\7\479d9b6df9874af16ce7b3774caa5f4b3f7b63d3

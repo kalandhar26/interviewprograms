@@ -35,7 +35,7 @@ public class reverseNumber {
         // Reverse a String
 
         String input = "BabaKalandhar";
-        String reverseString = Stream.of(input).map(str -> new StringBuilder(str)).collect(Collectors.joining());
+        String reverseString = Stream.of(input).map(str -> new StringBuilder(str).reverse()).collect(Collectors.joining());
         System.out.println(reverseString);
 
     }

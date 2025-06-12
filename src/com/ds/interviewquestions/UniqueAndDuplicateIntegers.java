@@ -19,8 +19,7 @@ public class UniqueAndDuplicateIntegers {
 
         // Remove Duplicates and Print them
         List<Integer> uniqueElements = inputList.stream()
-                .distinct()
-                .toList();
+                .distinct().toList();
 
         System.out.println("Unique elements: " + uniqueElements);
 
