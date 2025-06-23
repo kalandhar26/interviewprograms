@@ -6,9 +6,10 @@ public class ProductOfAllElementsExceptSelf {
 
     public static void main(String[] args) {
 
-        int[] array = {0,0,1,0,0};
+        int[] array = {2,1,2,3,2,1,3};
 
         int[] productResult = productExceptSelf(array);
+        int[] productResult1 = productExceptSelff(array);
         int[] sumResult = sumExceptSelf(array);
         System.out.println(Arrays.toString(productResult)+" || "+Arrays.toString(sumResult));
 
@@ -53,6 +54,25 @@ public class ProductOfAllElementsExceptSelf {
             result[i] += rightSum;
             rightSum += array[i];
         }
+
+        return result;
+    }
+
+
+    public static int[] productExceptSelff(int[] array){
+        int n = array.length;
+        int[] result = new int[n];
+
+        // Initialize the result array with 1
+
+
+        int dummyValue=1;
+        Arrays.fill(result,1);
+
+       for(int i=0;i<n;i++){
+           result[i] = result[i]*dummyValue;
+           dummyValue = dummyValue * array[i];
+       }
 
         return result;
     }
