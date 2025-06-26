@@ -138,6 +138,80 @@ persistence.
 *This document summarizes the architecture, workflow, and development activities involved in the GC2 middleware
 application.*
 
+# Overview of the Project:
+
+- At J.P. Morgan, I worked on the Global Clearing Connector (GC2) application, a middleware payment gateway designed to
+  facilitate seamless integration between internal payment processors (such as PLUTUS) and external clearing systems.
+- The application supports multiple protocols and message formats—handling JSON over Kafka for internal communication
+  and XML,
+  SWIFT, or ISO 20022 formats over Message Queues for external systems.
+
+## Core Responsibilities of the Application:
+
+**GC2 is responsible for:**
+
+- *Protocol Mediation:* Bridging communication between Kafka and traditional MQ-based systems.
+- *Data Transformation:* Converting messages between formats (e.g., JSON to XML).
+- *Schema Validation:* Ensuring incoming and outgoing messages adhere to the expected structure.
+- *Flow-Based Routing:* Determining message paths based on business rules and message metadata.
+
+All message activity is persisted in Oracle DB to maintain full auditability and traceability, ensuring operational
+transparency and compliance.
+
+## Modules I Contributed To:
+
+**1. Core Module:**
+
+- This module handles the primary message processing workflow. It uses configurable action classes to perform
+  transformation, enrichment, validation, and error handling steps.
+- The design follows a Chain of Responsibility pattern driven by external JSON-based configurations. The Core Module
+  interacts with Kafka, MQ systems, and the Orchestration Module to carry out end-to-end processing.
+
+**2. End-to-End (E2E) Testing Module:**
+
+- This module provides an environment to simulate production-like message flows using embedded Kafka, MQ, and HSQLDB.
+- It is implemented using Cucumber with Gherkin feature files to define test scenarios.
+- The framework supports end-to-end testing for payment flows such as IRCT, RRCT, and BRDT, including DB state
+  management through SQL scripts and customized step definitions.
+
+**3. Orchestration Module:**
+
+- This component manages all configurations required for routing, connectivity, and flow behavior.
+- It defines how each message type should be handled, based on source, destination, and business rules.
+- The Core Module relies on this service for retrieving processing logic dynamically at runtime.
+
+## Supported Payment Flows:
+
+**IRCT (Inward Real-Time Credit Transfer):**
+
+- Receives a JSON message from PLUTUS via Kafka, transforms it into XML using C24 mapping libraries, and routes it to
+  the
+  appropriate clearing house via MQ.
+
+**RRCT (Return Real-Time Credit Transfer):**
+
+- Receives an XML message from the clearing body via MQ, processes it (transformation, validation, enrichment), and
+  sends
+  a JSON response to PLUTUS via Kafka.
+
+**BRDT (Batch Report Distribution Transfer):**
+
+- Handles non-payment related batch data or reports from clearing systems. The data is processed and routed to external
+  systems as per defined configurations.
+
+## Challenges Faced:
+
+**Schema Validation Failures:**
+
+- Occasionally, external systems sent unexpected or invalid message formats, which led to schema validation issues. We
+  implemented enhanced error handling and logging mechanisms to capture and isolate these problems quickly.
+
+**Frequent Mapping and Logic Updates:**
+
+- As business requirements evolved, there were regular changes to transformation mappings and routing logic. This
+  required
+  agile development practices and close collaboration with business analysts to ensure accurate and timely updates.
+
 ## Biggest Challenge:
 
 ### Biggest Challenge in GC2 Project
