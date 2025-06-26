@@ -2,9 +2,8 @@
 
 - My name is BabaKalandhar, and I’m from Tirupati, Andhra Pradesh. I completed my BTech in Computer Science from Sastra
   University.
-- I have 6 years of exposure in IT industry, with focus on Java and Springboot technologies. During this time i got
-  considerable knowledge on various technologies like Springboot, Spring data JPA, Spring Security, Spring cloud for
-  developing microservices and database management.
+- I have 6 years of exposure in IT industry, with focus on Java and Springboot technologies. During this time i worked
+  with technologies like Springboot, Spring data JPA, Spring Security, Spring cloud for developing microservices, database management, Docker, Kubernetes and AWS.
 - I’ve worked on designing, implementing and developing APIs, focus on writing business logic, and writing test cases
   using JUnit and Mockito.
 - I attend stand-up meetings where i will discuss progress for the day and address blockers if any. I also take part in
@@ -16,21 +15,22 @@
 - One of the things that really contribute to my well-being is my daily routine. I prioritize the action items well in
   advance for the day, so that I exercise regularly and get enough sleep. . This not only keeps me physically healthy
   but also improves my mental health and overall mood.
-- Outside of work, I have hobbies and interests that keep me engaged and entertained. Whether it's chilling out with my
-  friends, planning trips, or exploring nature, I always make time for activities that bring me joy.
+- Outside of work, I have hobbies and interests that keep me engaged and entertained.I always make time for activities
+  that bring me joy.
 - When something is not going my way, I seek help from either my family members in personal life or colleagues in
   professional life.
 - In addition to this, I also have a job that I enjoy, where I use my skills and knowledge to make a positive impact. It
   makes me happy when I see my skills and knowledge contributing to either my career growth or organization growth.
 - Recently, my life has become even more joyful with marriage and the arrival of my baby. To cherish these precious
-  moments, I took a career break to focus on my family. Now, I’m eager to return to work with renewed energy and
+  moments, I took a career break to focus on my family. Now, I’m eager to return to work with refreshed energy and
   dedication.
 
 ## Why are you leaving current Organiation?
 
 - I’ve learned a lot and had a great experience in my current organization.
-- I believe the time is right for me to take the next step in my career.I’m looking for new challenges that will allow
-  me to take on greater responsibilities and continue growing both professionally and personally.
+- I believe the time is right for me to take the next step in my career.
+- I’m looking for new challenges that will allow me to take on greater responsibilities and continue growing both
+  professionally and personally.
 - I need a change of environment that can challenge and motivate me to develop new skill sets.
 - This opportunity seems to be more aligned to make my long term goals and aspirations.
 
@@ -56,12 +56,13 @@
   changes reduced latency, improved reliability, and helped avoid future outages. This effort was recognized by the
   leadership team, and I was given an award for successfully resolving this high-priority issue and improving overall
   system stability
-   
 
 # Future Goals
 
 - I’m currently working as a Senior Software Developer, and my goal is to continue improving my technical skills,
-  especially in Java and backend technologies. While I do plan to take on leadership roles in the future, I’ve decided
-  not to take a Tech Lead role at this time due to some family responsibilities and because I’m currently pursuing an
-  MBA. For now, I’m focused on growing as a strong individual contributor. In the long term, I aim to take up a role
-  where I can combine my technical experience and leadership skills to contribute to the company’s success.
+  especially in Java and backend technologies.
+- While I do plan to take on leadership roles in the future.
+- For now, I’m focused on growing as a strong individual contributor, due to some family responsibilities and because
+  I’m currently pursuing an MBA.
+- In the long term, I aim to take up a role where I can combine my technical experience and leadership skills to
+  contribute to the company’s success.

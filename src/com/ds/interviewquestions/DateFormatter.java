@@ -1,10 +1,5 @@
 package com.ds.interviewquestions;
 
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
