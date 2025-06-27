@@ -143,8 +143,7 @@ application.*
 - At J.P. Morgan, I worked on the Global Clearing Connector (GC2) application, a middleware payment gateway designed to
   facilitate seamless integration between internal payment processors (such as PLUTUS) and external clearing systems.
 - The application supports multiple protocols and message formats—handling JSON over Kafka for internal communication
-  and XML,
-  SWIFT, or ISO 20022 formats over Message Queues for external systems.
+  and XML, SWIFT, or ISO 20022 formats over Message Queues for external systems.
 
 ## Core Responsibilities of the Application:
 
@@ -162,23 +161,23 @@ transparency and compliance.
 
 **1. Core Module:**
 
-- This module handles the primary message processing workflow. It uses configurable action classes to perform
-  transformation, enrichment, validation, and error handling steps.
+- This module handles the primary message processing workflow.
+- It uses configurable action classes to perform transformation, enrichment, validation, and error handling steps.
 - The design follows a Chain of Responsibility pattern driven by external JSON-based configurations. The Core Module
   interacts with Kafka, MQ systems, and the Orchestration Module to carry out end-to-end processing.
 
-**2. End-to-End (E2E) Testing Module:**
+**2. Orchestration Module:**
+
+- This component manages all configurations required for routing, connectivity, and flow behavior.
+- It defines how each message type should be handled, based on source, destination, and business rules.
+- The Core Module relies on this service for retrieving processing logic dynamically at runtime.
+
+**3. End-to-End (E2E) Testing Module:**
 
 - This module provides an environment to simulate production-like message flows using embedded Kafka, MQ, and HSQLDB.
 - It is implemented using Cucumber with Gherkin feature files to define test scenarios.
 - The framework supports end-to-end testing for payment flows such as IRCT, RRCT, and BRDT, including DB state
   management through SQL scripts and customized step definitions.
-
-**3. Orchestration Module:**
-
-- This component manages all configurations required for routing, connectivity, and flow behavior.
-- It defines how each message type should be handled, based on source, destination, and business rules.
-- The Core Module relies on this service for retrieving processing logic dynamically at runtime.
 
 ## Supported Payment Flows:
 
@@ -209,8 +208,8 @@ transparency and compliance.
 **Frequent Mapping and Logic Updates:**
 
 - As business requirements evolved, there were regular changes to transformation mappings and routing logic. This
-  required
-  agile development practices and close collaboration with business analysts to ensure accurate and timely updates.
+  required agile development practices and close collaboration with business analysts to ensure accurate and timely
+  updates.
 
 ## Biggest Challenge:
 
@@ -257,7 +256,5 @@ It turned out that:
 ### 📌 Key Takeaway:
 
 - This incident was a turning point in how we approach performance tuning. It highlighted the importance of proper
-  caching
-  strategies, thread safety, and configuration validation in production environments. We’ve since added performance
-  gates
-  in our CI/CD pipeline and established clear runbooks for handling similar schema-related issues.
+  caching strategies, thread safety, and configuration validation in production environments. We’ve since added
+  performance gates in our CI/CD pipeline and established clear runbooks for handling similar schema-related issues.
