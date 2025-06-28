@@ -161,37 +161,34 @@ transparency and compliance.
 
 **1. Core Module:**
 
-- This module handles the primary message processing workflow.
-- It uses configurable action classes to perform transformation, enrichment, validation, and error handling steps.
-- The design follows a Chain of Responsibility pattern driven by external JSON-based configurations. The Core Module
-  interacts with Kafka, MQ systems, and the Orchestration Module to carry out end-to-end processing.
+- This module handles the *primary message processing workflow.*
+- It uses *configurable action classes* to perform *T*ransformation, *E*nrichment, *V*alidation, and *E*rror handling steps.
+- The design follows a *Chain of Responsibility* pattern driven by external *JSON-based configurations.*
+- The Core Module *interacts* with Kafka, MQ systems, and the Orchestration Module to carry out end-to-end processing.
 
 **2. Orchestration Module:**
 
-- This component manages all configurations required for routing, connectivity, and flow behavior.
-- It defines how each message type should be handled, based on source, destination, and business rules.
-- The Core Module relies on this service for retrieving processing logic dynamically at runtime.
+- This component *manages all configurations* required for *R*outing, *C*onnectivity, and *F*low behavior.
+- It defines how *each message type* should be handled, based on source, destination, and business rules.
+- The Core Module relies on this service for *retrieving processing logic* dynamically at runtime.
 
 **3. End-to-End (E2E) Testing Module:**
 
 - This module provides an environment to simulate production-like message flows using embedded Kafka, MQ, and HSQLDB.
-- It is implemented using Cucumber with Gherkin feature files to define test scenarios.
-- The framework supports end-to-end testing for payment flows such as IRCT, RRCT, and BRDT, including DB state
-  management through SQL scripts and customized step definitions.
+- It is implemented using Cucumber with Gherkin feature files to define *test scenarios.*
+- The framework supports end-to-end testing for *payment flows and DB state management* through *SQL scripts and customized step definitions.*
 
 ## Supported Payment Flows:
 
 **IRCT (Inward Real-Time Credit Transfer):**
 
 - Receives a JSON message from PLUTUS via Kafka, transforms it into XML using C24 mapping libraries, and routes it to
-  the
-  appropriate clearing house via MQ.
+  the appropriate clearing house via MQ.
 
 **RRCT (Return Real-Time Credit Transfer):**
 
 - Receives an XML message from the clearing body via MQ, processes it (transformation, validation, enrichment), and
-  sends
-  a JSON response to PLUTUS via Kafka.
+  sends a JSON response to PLUTUS via Kafka.
 
 **BRDT (Batch Report Distribution Transfer):**
 
@@ -216,10 +213,8 @@ transparency and compliance.
 ### Biggest Challenge in GC2 Project
 
 - One of the biggest challenges I faced in the GC2 project was a critical performance degradation during the processing
-  of
-  IRCT (Instant Retail Credit Transfer) messages. Under normal conditions, each message was processed in around 50ms,
-  but
-  during peak hours, this spiked to 500ms or more, causing a massive message backlog and pushing us dangerously close to
+  of IRCT (Instant Retail Credit Transfer) messages. Under normal conditions, each message was processed in around 50ms,
+  but during peak hours, this spiked to 500ms or more, causing a massive message backlog and pushing us dangerously close to
   SLA violations for real-time payments.
 
 ### 🔍 Root Cause Analysis:
