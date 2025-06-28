@@ -141,8 +141,7 @@ application.*
 # Overview of the Project:
 
 - At J.P. Morgan, I worked on the Global Clearing Connector (GC2) application, a **middleware payment gateway** designed
-  to
-  facilitate seamless integration between internal **payment processors** (such as PLUTUS) and external **clearing
+  to facilitate seamless integration between internal **payment processors** (such as PLUTUS) and external **clearing
   systems**.
 - The application supports multiple protocols and message formats—handling JSON over Kafka for internal communication
   and XML, SWIFT, or ISO 20022 formats over Message Queues for external systems.
@@ -156,8 +155,8 @@ application.*
 - **Schema Validation**: Ensuring incoming and outgoing messages adhere to the expected structure.
 - **Flow-Based Routing**: Determining message paths based on **business rules** and **message metadata.**
 
-All message activity is persisted in Oracle DB to maintain full **auditability** and **traceability**, ensuring **operational
-transparency** and **compliance.**
+All message activity is persisted in Oracle DB to maintain full **auditability** and **traceability**, ensuring
+**operational transparency** and **compliance.**
 
 ## Modules I Contributed To:
 
