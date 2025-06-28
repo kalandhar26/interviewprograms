@@ -140,10 +140,10 @@ application.*
 
 # Overview of the Project:
 
-- At J.P. Morgan, I worked on the Global Clearing Connector (GC2) application, a *
-  *<span style="background-color: #FFFF00">middleware payment gateway</span>** designed to
-  facilitate seamless integration between internal **<span style="background-color: #FFFF00">payment processors</span>
-  ** (such as PLUTUS) and external **<span style="background-color: #FFFF00">clearing systems</span>**.
+- At J.P. Morgan, I worked on the Global Clearing Connector (GC2) application, a **middleware payment gateway** designed
+  to
+  facilitate seamless integration between internal **payment processors** (such as PLUTUS) and external **clearing
+  systems**.
 - The application supports multiple protocols and message formats—handling JSON over Kafka for internal communication
   and XML, SWIFT, or ISO 20022 formats over Message Queues for external systems.
 
@@ -151,50 +151,36 @@ application.*
 
 **GC2 is responsible for:**
 
-- **<span style="background-color: #FFFF00">Protocol Mediation</span>**: Bridging communication between Kafka and
-  traditional MQ-based systems.
-- **<span style="background-color: #FFFF00">Data Transformation</span>**: Converting messages between formats (e.g.,
-  JSON to XML).
-- **<span style="background-color: #FFFF00">Schema Validation</span>**: Ensuring incoming and outgoing messages adhere
-  to the expected structure.
-- **<span style="background-color: #FFFF00">Flow-Based Routing</span>**: Determining message paths based on business
-  rules and message metadata.
+- **Protocol Mediation**: Bridging communication between Kafka and traditional MQ-based systems.
+- **Data Transformation**: Converting messages between formats (e.g., JSON to XML).
+- **Schema Validation**: Ensuring incoming and outgoing messages adhere to the expected structure.
+- **Flow-Based Routing**: Determining message paths based on **business rules** and **message metadata.**
 
-All message activity is persisted in Oracle DB to maintain full auditability and traceability, ensuring operational
-transparency and compliance.
+All message activity is persisted in Oracle DB to maintain full **auditability** and **traceability**, ensuring **operational
+transparency** and **compliance.**
 
 ## Modules I Contributed To:
 
 **1. Core Module:**
 
-- This module handles the **<span style="background-color: #FFFF00">primary message processing workflow</span>**.
-- It uses **<span style="background-color: #FFFF00">configurable action classes</span>** to
-  perform **<span style="background-color: #FFFF00">T</span>**ransformation, **<span style="background-color: #FFFF00">
-  E</span>**nrichment, **<span style="background-color: #FFFF00">V</span>**alidation,
-  and **<span style="background-color: #FFFF00">E</span>**rror handling steps.
-- The design follows a **<span style="background-color: #FFFF00">Chain of Responsibility</span>** pattern driven by
-  external **<span style="background-color: #FFFF00">JSON-based configurations</span>**.
-- The Core Module **<span style="background-color: #FFFF00">interacts</span>** with Kafka, MQ systems, and the
-  Orchestration Module to carry out end-to-end processing.
+- This module handles the **primary message processing workflow**.
+- It uses **configurable action classes** to perform **T**ransformation, **E**nrichment, **V**alidation, and **E**rror
+  handling steps.
+- The design follows a **Chain of Responsibility** pattern driven by external **JSON-based configurations**.
+- The Core Module **interacts** with Kafka, MQ systems, and the Orchestration Module to carry out end-to-end processing.
 
 **2. Orchestration Module:**
 
-- This component **<span style="background-color: #FFFF00">manages all configurations</span>** required
-  for **<span style="background-color: #FFFF00">R</span>**outing, **<span style="background-color: #FFFF00">C</span>**
-  onnectivity, and **<span style="background-color: #FFFF00">F</span>**low behavior.
-- It defines how **<span style="background-color: #FFFF00">each message type</span>** should be handled, based on
-  source, destination, and business rules.
-- The Core Module relies on this service for **<span style="background-color: #FFFF00">retrieving processing
-  logic</span>** dynamically at runtime.
+- This component **manages all configurations** required for **R**outing, **C**onnectivity, and **F**low behavior.
+- It defines how **each message type** should be handled, based on source, destination, and business rules.
+- The Core Module relies on this service for **retrieving processing logic** dynamically at runtime.
 
 **3. End-to-End (E2E) Testing Module:**
 
 - This module provides an environment to simulate production-like message flows using embedded Kafka, MQ, and HSQLDB.
-- It is implemented using Cucumber with Gherkin feature files to define **<span style="background-color: #FFFF00">test
-  scenarios</span>**.
-- The framework supports end-to-end testing for **<span style="background-color: #FFFF00">payment flows and DB state
-  management</span>** through **<span style="background-color: #FFFF00">SQL scripts and customized step
-  definitions</span>**.
+- It is implemented using Cucumber with Gherkin feature files to define **test scenarios**.
+- The framework supports end-to-end testing for **payment flows and DB state management** through **SQL scripts and
+  customized step definitions**.
 
 ## Supported Payment Flows:
 
