@@ -30,6 +30,24 @@ public class ValidParantheses {
         return stack.empty();
     }
 
+    public static int isValidParanthesisBy(String input) {
+        Stack<Character> stack = new Stack<>();
+
+        for (int i = 0; i < input.length(); i++) {
+            char current = input.charAt(i);
+            if (current == '[' || current == '{' || current == '(') {
+                stack.push(current);
+            } else {
+                if (!stack.empty() && (stack.peek() == '(' && input.charAt(i) == ')' || stack.peek() == '{' && input.charAt(i) == '}' || stack.peek() == '[' && input.charAt(i) == ']')) {
+                    stack.pop();
+                } else {
+                    return 0;
+                }
+            }
+        }
+        return stack.size();
+    }
+
     public static boolean isValidParanthes(String input) {
         Stack<Character> stack = new Stack<>();
         Map<Character, Character> matchingPairs = getMatchingPairs();

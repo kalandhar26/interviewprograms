@@ -239,7 +239,9 @@ It turned out that:
 
 - Enabled schema caching via a hotfix.
 - Scaled the validation thread pool temporarily to reduce system pressure.
-  *Then, for the long-term fix, we:*
+
+*Then, for the long-term fix, we:*
+
 - Built a thread-safe schema caching layer using ConcurrentHashMap to store compiled schemas.
 - Refactored the validation logic to use ThreadLocal validators, preventing contention.
 - Preloaded all required schemas at application startup.
