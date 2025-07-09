@@ -17,7 +17,7 @@ public class DuplicateInString{
 
         // 1. Find Words Starting with 'A' from a list and collect them
         System.out.println("================== Names starts with R  ===========");
-        employeeList.stream().filter(name -> name.getName().startsWith("R")).map(Employee::getName).collect(Collectors.toList()).forEach(System.out::println);
+        employeeList.stream().filter(name -> name.getName().startsWith("R")).map(Employee::getName).toList().forEach(System.out::println);
 
         // 2. Filter Employees based on their gender
         Map<String, List<Employee>> collect = employeeList.stream().collect(Collectors.groupingBy(Employee::getGender));
@@ -41,7 +41,7 @@ public class DuplicateInString{
 
         String[] s = input.split(" ");
         List<String> list = Arrays.asList(s);
-        List<String> duplicateList = list.stream().filter(dup -> list.stream().filter(dup1 -> dup.equalsIgnoreCase(dup1)).count() > 1).distinct().collect(Collectors.toList());
+        List<String> duplicateList = list.stream().filter(dup -> list.stream().filter(dup::equalsIgnoreCase).count() > 1).distinct().toList();
         System.out.println("================== Duplicate Values ===========");
         for (String e : duplicateList) {
             System.out.println(e);
@@ -50,7 +50,7 @@ public class DuplicateInString{
         // To count duplicate Values
         Map<String, Integer> duplicateValue = new HashMap<>();
         for (String word : list) {
-            // Checkword is present in Map or not ( Initially it returns null
+            // Check word is present in Map or not (Initially it returns null
             Integer wordCount = duplicateValue.get(word);
             if (wordCount == null)
                 wordCount = 0;

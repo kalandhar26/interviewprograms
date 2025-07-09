@@ -21,7 +21,7 @@ public class UniqueAndDuplicateInString {
                 .filter(entry -> entry.getValue() > 1)
                 .map(Map.Entry::getKey)
                 .map(String::valueOf)
-                .collect(Collectors.joining());
+                .collect(Collectors.joining(", "));
 
         // Remove duplicate and print String
         String removeDupliacteAndPrint =inputString.chars()

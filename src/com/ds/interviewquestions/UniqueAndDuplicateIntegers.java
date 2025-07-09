@@ -12,16 +12,18 @@ public class UniqueAndDuplicateIntegers {
 
 
         // Input type 1
-        List<Integer> inputList = Arrays.asList(1, 2, 3, 2,2, 4, 5, 3, 6, 7, 8, 7, 9);
+        List<Integer> inputList = Arrays.asList(1, 2, 3, 2, 2, 4, 5, 3, 6, 7, 8, 7, 9);
+
+        processList(inputList);
 
         // Input type 2
-        Integer[] inputArray = {1, 2, 3, 2,2, 4, 5, 3, 6, 7, 8, 7, 9};
+        Integer[] inputArray = {1, 2, 3, 2, 2, 4, 5, 3, 6, 7, 8, 7, 9};
 
         // Remove Duplicates and Print them
         List<Integer> uniqueElements = inputList.stream()
                 .distinct().toList();
 
-        System.out.println("Unique elements: " + uniqueElements);
+        System.out.println("Remove Duplicates elements: " + uniqueElements);
 
         // Finding duplicates and Print them
         Map<Integer, Long> elementCountMap = inputList.stream()
@@ -32,7 +34,7 @@ public class UniqueAndDuplicateIntegers {
                 .map(Map.Entry::getKey)
                 .toList();
 
-        System.out.println("Duplicate elements: " + duplicateElements);
+        System.out.println("Only Duplicate elements: " + duplicateElements);
 
         // Print only unique numbers
         List<Integer> uniqueNumbers = inputList.stream()
@@ -42,13 +44,23 @@ public class UniqueAndDuplicateIntegers {
         System.out.println("Only Unique Numbers: " + uniqueNumbers);
     }
 
-    public static void processList(List<Integer> inputList){
+    public static void processList(List<Integer> inputList) {
 
-       // print Only duplicates values
+        // print Only duplicates values
+        System.out.println("======Only Duplicate Values========");
+        List<String> duplicateValues = inputList.stream()
+                .collect(Collectors.groupingBy(e -> e, Collectors.counting()))
+                .entrySet().stream().filter(entry -> entry.getValue() > 1).map(Map.Entry::getKey).map(String::valueOf).toList();
 
+        duplicateValues.forEach(System.out::println);
         // print Only Unique values
-
-        // Remove duplicates and print restYesPl
+        System.out.println("======Only Unique Values========");
+        inputList.stream()
+                .collect(Collectors.groupingBy(e -> e, Collectors.counting()))
+                .entrySet().stream().filter(entry -> entry.getValue() == 1).map(Map.Entry::getKey).map(String::valueOf).forEach(System.out::println);
+        // Remove duplicates and print rest
+        System.out.println("======Remove Duplicates (Print Duplicate + Unique Values)========");
+        inputList.stream().distinct().map(String::valueOf).forEach(System.out::println);
 
 
     }

@@ -7,6 +7,8 @@ public class TrappingRainWater {
         int[] array = {3, 2, 1, 6, 4, 5};
 
         System.out.println(trapRainWater(array));
+        System.out.println(trapWater(array));
+        System.out.println(waterTrapped(array));
     }
 
     public static int trapRainWater(int[] array) {
@@ -50,5 +52,27 @@ public class TrappingRainWater {
         }
 
         return empty;
+    }
+
+
+    public static int waterTrapped(int[] array){
+        int left=0;
+        int right = array.length-1;
+        int leftMax = array[left];
+        int rightMax = array[right];
+        int waterTrapped=0;
+        while(left < right){
+            if(leftMax <= rightMax){
+                left++;
+                leftMax = Math.max(leftMax,array[left]);
+                waterTrapped += leftMax-array[left];
+            }else {
+                right--;
+                rightMax = Math.max(rightMax,array[right]);
+                waterTrapped += rightMax-array[right];
+            }
+        }
+
+        return waterTrapped;
     }
 }

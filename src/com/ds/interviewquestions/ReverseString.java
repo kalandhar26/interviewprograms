@@ -9,6 +9,14 @@ public class ReverseString {
         String originalString = "HelloWorld";
         String result="";
 
+        // Direct Streams
+        System.out.println(
+                originalString.chars().collect(
+                StringBuilder::new,
+                (sb,c)-> sb.insert(0,(char)c),
+                StringBuilder::append)
+                .toString());
+
         // Normal Java
         for(int i=0;i<originalString.length();i++){
             result = originalString.charAt(i)+result;
