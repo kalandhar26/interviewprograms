@@ -1,6 +1,5 @@
 package com.ds.interviewquestions;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +15,12 @@ public class UniqueAndDuplicateIntegers {
 
         processList(inputList);
 
+
         // Input type 2
         Integer[] inputArray = {1, 2, 3, 2, 2, 4, 5, 3, 6, 7, 8, 7, 9};
+        int [] inputArray1 = {1,1,2,2,3,0,3};
+
+        findSingleUniqueNumber(inputArray1);
 
         // Remove Duplicates and Print them
         List<Integer> uniqueElements = inputList.stream()
@@ -62,6 +65,16 @@ public class UniqueAndDuplicateIntegers {
         System.out.println("======Remove Duplicates (Print Duplicate + Unique Values)========");
         inputList.stream().distinct().map(String::valueOf).forEach(System.out::println);
 
+    }
+
+    public static  void findSingleUniqueNumber(int[] array){
+        int unique=0;
+
+        for(int x : array){
+            unique ^= x;
+        }
+
+        System.out.println("===>"+unique);
 
     }
 
