@@ -44,3 +44,11 @@ aws ecs update-service --cluster my-cluster \
   --service my-service \
   --force-new-deployment
 ```
+
+# Interview Questions
+
+## How do you deploy a springboot microservice on AWS ECS or EKS?
+
+## When to use SQS vs Kafka in AWS architecture?
+
+## How do you manage secrets and environment variables securely in AWS?
