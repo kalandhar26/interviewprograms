@@ -4,7 +4,7 @@
 - **Jenkins** for **automation**, 
 - **Docker** for **containerization**, and 
 - **Kubernetes** hosted on AWS EKS for **orchestration**.
-- The process ensured **consistent, reliable deployments** with zero downtime.
+- This process ensures **consistent, reliable deployments** with zero downtime.
 - We follow a bi-weekly release cycle after thorough QA and UAT. 
 - My role involved **integrating CI/CD pipelines and Dockerizing microservices**, collaborating closely with the DevOps team.
 
@@ -48,7 +48,7 @@
 ### Kubernetes Deployment on AWS EKS
 
 #### **Orchestration:**
-- We deployed microservices to a Kubernetes cluster managed by AWS EKS. 
+- Kubernetes on EKS pulls the image from ECR and deploys it into pods, which run the microservice.
 - EKS provided a scalable, managed environment for running Kubernetes workloads.
 
 ## 📦 Deployment Artifacts
