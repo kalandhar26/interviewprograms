@@ -1,57 +1,18 @@
 package com.ds.interviewquestions;
 
+import com.ds.java21.streams.GenerateList;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class JavaEightQuestions {
 
-
-    public  static List<Employee> getEmployeeList(){
-
-        List<String> list1 = new ArrayList<>();
-        list1.add("Batting");
-        list1.add("Bowling");
-        list1.add("Fielding");
-        List<String> list2 = new ArrayList<>();
-        list2.add("Keeping");
-        list2.add("umpiring");
-        list2.add("stumping");
-        List<String> list3 = new ArrayList<>();
-        list3.add("spot fixing");
-        list3.add("match fixing");
-        list3.add("ball tampering");
-
-
-
-        Employee e1 = new Employee(1, 2000, 1, "Active", "BabaKalandhar", 26, "MALE", "CSE",list1 ,2018);
-        Employee e2 = new Employee(2, 30000, 1, "InActive", "SharinAlavudeen", 23, "FEMALE", "IT", list2,2021);
-        Employee e3 = new Employee(3, 40000, 1, "Active", "RukiyaAnjum", 16, "FEMALE", "ECE", list3,2023);
-        Employee e4 = new Employee(4, 50000, 2, "InActive", "NikilaReddy", 18, "FEMALE", "EEE",list1 , 2022);
-        Employee e5 = new Employee(5, 60000, 2, "Active", "HarshithaReddy", 20, "FEMALE", "IT",list2, 2021);
-        Employee e6 = new Employee(6, 70000, 2, "InActive", "RubyRani", 21, "FEMALE", "CSE",list1 , 2020);
-        Employee e7 = new Employee(7, 80000, 3, "Active", "AnkithaDave", 35, "FEMALE", "EEE", list3,2010);
-        Employee e8 = new Employee(8, 90000, 3, "InActive", "ViratKohli", 40, "MALE", "IT",list2, 2005);
-        Employee e9 = new Employee(9, 10000, 3, "Active", "RajaKalandhar", 24, "MALE", "ECE",list1 , 2015);
-
-        List<Employee> employeeList = new ArrayList<>();
-        employeeList.add(e1);
-        employeeList.add(e2);
-        employeeList.add(e3);
-        employeeList.add(e4);
-        employeeList.add(e5);
-        employeeList.add(e6);
-        employeeList.add(e7);
-        employeeList.add(e8);
-        employeeList.add(e9);
-
-        return employeeList;
-
-    }
-
     public static void main(String[] args) {
 
-        List<Employee> employeeList = getEmployeeList();
+        GenerateList list = new GenerateList();
+
+        List<Employee> employeeList = list.generateEmployeesList();
 
         System.out.println("==========Print Maximum Salary from Collection=================");
         Employee employee = employeeList.stream().max(Comparator.comparingDouble(Employee::getSalary)).get();
@@ -67,7 +28,7 @@ public class JavaEightQuestions {
         System.out.println(collect);
 
         System.out.println("==========Print Only Inactive Employees from list=================");
-        List<Employee> inactiveEmployees = employeeList.stream().filter(emp -> emp.getStatus().equals("InActive")).collect(Collectors.toList());
+        List<Employee> inactiveEmployees = employeeList.stream().filter(emp -> emp.getStatus().equals("InActive")).toList();
 
         for (Employee e : inactiveEmployees) {
             System.out.println(e.toString());
@@ -78,7 +39,7 @@ public class JavaEightQuestions {
         System.out.println(collect1);
 
         System.out.println("==========Print Employee Count=================");
-        Long collect3 = employeeList.stream().collect(Collectors.counting());
+        Long collect3 = employeeList.stream().count();
         System.out.println(collect3);
 
         System.out.println("==========Print Employee Count department wise=================");
@@ -100,7 +61,7 @@ public class JavaEightQuestions {
             System.out.println(e.toString());
 
         System.out.println("==========Print All Employee except top 3 salaried employees=================");
-        employeeList.stream().sorted((o5, o6) -> (int) (o6.getSalary() - o5.getSalary())).skip(3).collect(Collectors.toList()).forEach(System.out::println);
+        employeeList.stream().sorted((o5, o6) -> (int) (o6.getSalary() - o5.getSalary())).skip(3).forEach(System.out::println);
 
         System.out.println("=========================== Count No of Male and Female Employees=============");
         Map<String, Long> collect7 = employeeList.stream().collect(Collectors.groupingBy(Employee::getGender, Collectors.counting()));
@@ -139,7 +100,7 @@ public class JavaEightQuestions {
 
         System.out.println("===========================Employees who passedout after 2020 =============");
 
-        employeeList.stream().filter(x -> x.getPassedOutyear() > 2020).collect(Collectors.toList()).forEach(System.out::println);
+        employeeList.stream().filter(x -> x.getPassedOutyear() > 2020).toList().forEach(System.out::println);
 
         employeeList.stream().filter(x -> x.getPassedOutyear() > 2020).map(Employee::getName).forEach(System.out::println);
 
@@ -156,8 +117,7 @@ public class JavaEightQuestions {
 
         System.out.println("========================== Youngest Employee ==========================");
 
-        String youngestEmployee = employeeList.stream().min(Comparator.comparingInt(Employee::getAge)).map(Employee::getName).get();
-        System.out.println(youngestEmployee);
+        employeeList.stream().min(Comparator.comparingInt(Employee::getAge)).map(Employee::getName).ifPresent(System.out::println);
 
         System.out.println("========================== Youngest MALE Employee ==========================");
 
@@ -169,7 +129,7 @@ public class JavaEightQuestions {
 
         System.out.println("========================== Total Salary needed to Organization to pay for Employees ==========================");
 
-        Double collect15 = employeeList.stream().collect(Collectors.summingDouble(Employee::getSalary));
+        Double collect15 = employeeList.stream().mapToDouble(Employee::getSalary).sum();
         System.out.println(collect15);
 
         System.out.println("========================== Average Salary of Each Employee ==========================");
@@ -177,37 +137,35 @@ public class JavaEightQuestions {
         System.out.println(collect16);
 
         System.out.println("========================== List Out Minor Employees ==========================");
-        employeeList.stream().filter(e -> e.getAge() < 18).map(Employee::getName).collect(Collectors.toList()).forEach(System.out::println);
+        employeeList.stream().filter(e -> e.getAge() < 18).map(Employee::getName).toList().forEach(System.out::println);
 
         System.out.println("========================== Increase Salary for employees who age is > 20 (Only hiked Salaries employees are displayed) ==========================");
-        employeeList.stream().filter(age -> age.getAge() > 20).map(employee2 -> {
+        employeeList.stream().filter(age -> age.getAge() > 20).peek(employee2 -> {
             double hikedSalary = employee2.getSalary() * 1.1;
             employee2.setSalary(hikedSalary);
-            return employee2;
-        }).collect(Collectors.toList()).forEach(System.out::println);
+        }).toList().forEach(System.out::println);
 
         System.out.println("========================== All Employees are displayed but hiked for only who has age above 25  ==========================");
-        employeeList.stream().map(employee3 -> {
+        employeeList.stream().peek(employee3 -> {
             if (employee3.getAge() > 25) {
                 employee3.setSalary(employee3.getSalary() * 1.1);
             }
-            return employee3;
-        }).collect(Collectors.toList()).forEach(System.out::println);
+        }).toList().forEach(System.out::println);
 
         System.out.println("========================== Filter Employee who name starts with R and contains reddy ==========================");
-        employeeList.stream().filter(s -> s.getName().toLowerCase().startsWith("r")).collect(Collectors.toList()).forEach(System.out::println);
-        employeeList.stream().filter(s -> s.getName().toLowerCase().contains("reddy")).collect(Collectors.toList()).forEach(System.out::println);
+        employeeList.stream().filter(s -> s.getName().toLowerCase().startsWith("r")).toList().forEach(System.out::println);
+        employeeList.stream().filter(s -> s.getName().toLowerCase().contains("reddy")).toList().forEach(System.out::println);
 
         System.out.println("========================== find Unique passout years in desc Order==========================");
-        employeeList.stream().sorted(Comparator.comparingDouble(Employee::getPassedOutyear).reversed()).map(Employee::getPassedOutyear).distinct().collect(Collectors.toList()).forEach(System.out::println);
+        employeeList.stream().sorted(Comparator.comparingDouble(Employee::getPassedOutyear).reversed()).map(Employee::getPassedOutyear).distinct().toList().forEach(System.out::println);
 
         System.out.println("========================== find dulicate passout years ==========================");
 
        employeeList.stream()
-                .filter(duplicates -> employeeList
+                .map(Employee::getPassedOutyear).filter(passedOutyear -> employeeList
                         .stream()
-                        .filter(passoutyear -> passoutyear.getPassedOutyear() == duplicates.getPassedOutyear()).count() > 1
-                ).map(Employee::getPassedOutyear).distinct().collect(Collectors.toList()).forEach(System.out::println);
+                        .filter(passoutyear -> passoutyear.getPassedOutyear() == passedOutyear).count() > 1
+                ).distinct().toList().forEach(System.out::println);
 
         System.out.println("==================== Generate List of Minor and Major ===================");
         Map<Boolean, List<Employee>> collect17 = employeeList.stream().collect(Collectors.partitioningBy(emp -> emp.getAge() > 18));
@@ -215,22 +173,24 @@ public class JavaEightQuestions {
         for(Map.Entry<Boolean, List<Employee>> entry : collect17.entrySet()){
             if(entry.getKey()){
                 System.out.println(" =======Employees who are majors=========");
+                System.out.println(entry.getValue());
             }else {
                 System.out.println("========== Minor Employees===============");
+                System.out.println(entry.getValue());
             }
 
-            List<Employee> list = entry.getValue();
-            for(Employee e : list){
+            List<Employee> list1 = entry.getValue();
+            for(Employee e : list1){
                 System.out.println(e.getName());
             }
         }
 
         // List Out all the hobbies
         System.out.println("============== Employees Hobbies =======================");
-        List<String> collect18 = employeeList.stream().map(Employee::getHobbies).flatMap(List::stream).distinct().collect(Collectors.toList());
+        List<String> collect18 = employeeList.stream().map(Employee::getHobbies).flatMap(List::stream).distinct().toList();
 
-        for(String list : collect18){
-            System.out.println(list);
+        for(String list1 : collect18){
+            System.out.println(list1);
         }
 
         // Count Age
@@ -238,5 +198,8 @@ public class JavaEightQuestions {
         double v = employeeList.stream().mapToDouble(Employee::getAge).sum();
         System.out.println(v);
         // =====================  End  =============================
+
+
+
     }
 }

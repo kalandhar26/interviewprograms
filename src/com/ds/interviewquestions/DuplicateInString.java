@@ -1,5 +1,7 @@
 package com.ds.interviewquestions;
 
+import com.ds.java21.streams.GenerateList;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -9,11 +11,13 @@ import java.util.stream.Stream;
 
 public class DuplicateInString{
 
-    private static List<Employee> employeeList = JavaEightQuestions.getEmployeeList();
-
-    private static String input = "I love my wife , because my wife is love of my life.";
 
     public static void main(String[] args) {
+
+        GenerateList list = new GenerateList();
+        List<Employee> employeeList = list.generateEmployeesList();
+        String input = "I love my wife , because my wife is love of my life.";
+
 
         // 1. Find Words Starting with 'A' from a list and collect them
         System.out.println("================== Names starts with R  ===========");
@@ -40,8 +44,8 @@ public class DuplicateInString{
         // 3. Find duplicate words in a String and Count them
 
         String[] s = input.split(" ");
-        List<String> list = Arrays.asList(s);
-        List<String> duplicateList = list.stream().filter(dup -> list.stream().filter(dup::equalsIgnoreCase).count() > 1).distinct().toList();
+        List<String> list1 = Arrays.asList(s);
+        List<String> duplicateList = list1.stream().filter(dup -> list1.stream().filter(dup::equalsIgnoreCase).count() > 1).distinct().toList();
         System.out.println("================== Duplicate Values ===========");
         for (String e : duplicateList) {
             System.out.println(e);
@@ -49,7 +53,7 @@ public class DuplicateInString{
 
         // To count duplicate Values
         Map<String, Integer> duplicateValue = new HashMap<>();
-        for (String word : list) {
+        for (String word : list1) {
             // Check word is present in Map or not (Initially it returns null
             Integer wordCount = duplicateValue.get(word);
             if (wordCount == null)
@@ -72,7 +76,7 @@ public class DuplicateInString{
 
 
         // create instance of custom functional interface
-        CustomFunctionalInterface addition = (a, b) -> (a + b);
+        CustomFunctionalInterface addition = Integer::sum;
 
         // use functional interface instance to call the method
         int sumofIntegers = addition.sum(5, 9);

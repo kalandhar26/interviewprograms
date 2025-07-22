@@ -1,5 +1,7 @@
 package com.ds.interviewquestions;
 
+import com.ds.java21.streams.GenerateList;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,7 +10,8 @@ public class EmployeeStartsWithSomeCharacter {
 
     public static void main(String[] args) {
 
-        List<Employee> employeeList = JavaEightQuestions.getEmployeeList();
+        GenerateList list = new GenerateList();
+        List<Employee> employeeList = list.generateEmployeesList();
 
         Map<String, Double> checkStatusWiseAvgAge = employeeList.stream()
                 .filter(p -> p.getName().startsWith("R"))

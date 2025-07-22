@@ -13,15 +13,14 @@ public class FindRepAndNonRepChar {
 
 
         // Repetative and Non Repetative Characters
-
         Map<Character, Long> charCount = input.chars().mapToObj(c -> (char) c).collect(Collectors.groupingBy(c -> c, Collectors.counting()));
 
         // Repetitive
-        List<Character> repetitiveCharacters = input.chars().mapToObj(c -> (char) c).filter(c -> charCount.get(c) > 1).collect(Collectors.toList());
+        List<Character> repetitiveCharacters = input.chars().mapToObj(c -> (char) c).filter(c -> charCount.get(c) > 1).toList();
         System.out.println(repetitiveCharacters.stream().findFirst().get());
 
         // Non Repetitive
-        List<Character> NonRepetitiveCharacters = input.chars().mapToObj(c -> (char) c).filter(c -> charCount.get(c) == 1).collect(Collectors.toList());
+        List<Character> NonRepetitiveCharacters = input.chars().mapToObj(c -> (char) c).filter(c -> charCount.get(c) == 1).toList();
         System.out.println(NonRepetitiveCharacters.stream().findFirst().get());
 
         // Another Way first Repeatative
@@ -34,7 +33,6 @@ public class FindRepAndNonRepChar {
 
 
         // first Non Repeatative
-
         Character character1 = input.chars().mapToObj(c -> (char) c).filter(c -> charCount.get(c) == 1).findFirst().get();
         System.out.println(character1);
     }

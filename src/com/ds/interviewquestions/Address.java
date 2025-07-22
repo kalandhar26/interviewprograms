@@ -18,13 +18,13 @@ public class Address {
     }
 
 
-    public Address(Integer id, String street, String city, String state, String country) {
-        this.id = id;
-        this.street = street;
-        this.city = city;
-        this.state = state;
-        this.country = country;
-    }
+        public Address(Integer id, String street, String city, String state, String country) {
+            this.id = id;
+            this.street = street;
+            this.city = city;
+            this.state = state;
+            this.country = country;
+        }
 
     public Integer getId() {
         return id;
