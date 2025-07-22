@@ -216,10 +216,9 @@ All message activity is persisted in Oracle DB to maintain full **auditability**
 ### Biggest Challenge in GC2 Project
 
 - One of the biggest challenges I faced in the GC2 project was a critical performance degradation during the processing
-  of IRCT (Instant Retail Credit Transfer) messages. Under normal conditions, each message was processed in around 50ms,
-  but during peak hours, this spiked to 500ms or more, causing a massive message backlog and pushing us dangerously
-  close to
-  SLA violations for real-time payments.
+  of IRCT (Instant Retail Credit Transfer) messages.
+- Under normal conditions, each message was processed in around 50ms, but during peak hours, this spiked to 500ms or
+  more, causing a massive message backlog and pushing us dangerously close to SLA violations for real-time payments.
 
 ### 🔍 Root Cause Analysis:
 
