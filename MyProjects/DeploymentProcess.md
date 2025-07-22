@@ -1,12 +1,13 @@
 # Overview of the Process
 
 - We used a modern CI/CD pipeline with
-- **Jenkins** for **automation**, 
-- **Docker** for **containerization**, and 
+- **Jenkins** for **automation**,
+- **Docker** for **containerization**, and
 - **Kubernetes** hosted on AWS EKS for **orchestration**.
 - This process ensures **consistent, reliable deployments** with zero downtime.
-- We follow a bi-weekly release cycle after thorough QA and UAT. 
-- My role involved **integrating CI/CD pipelines and Dockerizing microservices**, collaborating closely with the DevOps team.
+- We follow a bi-weekly release cycle after thorough QA and UAT.
+- My role involved **integrating CI/CD pipelines and Dockerizing microservices**, collaborating closely with the DevOps
+  team.
 
 # Step-by-Step Deployment Flow
 
@@ -42,77 +43,165 @@
 - Each microservice had its own Dockerfile for consistent environments across dev, staging, and production.
 - We used multi-stage builds to optimize image size, starting with a build stage and copying only the JAR to the runtime
   stage.
-- The build stage compiled the code and generated the JAR, while the runtime stage used a slim base image for deployment.
+- The build stage compiled the code and generated the JAR, while the runtime stage used a slim base image for
+  deployment.
 - Images were tested locally using docker run to verify functionality before pushing to ECR.
 
 ### Kubernetes Deployment on AWS EKS
 
 #### **Orchestration:**
+
 - Kubernetes on EKS pulls the image from ECR and deploys it into pods, which run the microservice.
 - EKS provided a scalable, managed environment for running Kubernetes workloads.
 
 ## 📦 Deployment Artifacts
 
-### 🔹 Helm Charts / kubectl Manifests
-- **Helm Charts** were primarily used to define:
-  - Deployments
-  - Services
-  - Ingress rules
-- Enabled parameterized and reusable configurations.
-- For simpler services, **raw YAML manifests** were applied using `kubectl apply`.
+### 🔹 Helm Charts (Like "Templates" for Kubernetes Deployments)
 
-### 🔹 ConfigMaps
-- Stored **non-sensitive configuration data** such as:
-  - Database URLs
-  - Broker endpoints
-  - Environment flags
+- Instead of writing the same Kubernetes YAML files repeatedly, we used Helm charts, which are like predefined templates
+  for our deployments.
+
+#### Why Helm?
+
+- Reusable Configurations: Each microservice (e.g., order-service, payment-service) had its own Helm chart.
+- Different Environments (Dev/QA/Prod): We could tweak settings (like CPU/memory) per environment using values.yaml.
+- Version Control: Helm allowed us to track changes and roll back if something went wrong.
+
+#### When We Used Raw kubectl (Without Helm)
+
+- For simpler services (like internal tools), we sometimes just applied YAML files directly with:
+
+```yaml
+kubectl apply -f deployment.yaml
+```
+
+- But Helm made things much cleaner for complex apps.
+
+### 🔹 ConfigMaps (For Non-Sensitive Configurations)
+
+- Instead of hardcoding settings (like database URLs) inside our Spring Boot app, we stored them in ConfigMaps.
+    - Database connection strings (jdbc:mysql://db-host:3306/orders)
+    - Feature flags (enable_new_checkout = true)
+    - External service URLs (payment-gateway = https://api.pay.com)
+
+#### How It Worked?
+
+- The ConfigMap was created once.
+- The app read these values at runtime (either as environment variables or files).
+- No need to rebuild Docker images when configs changed!
 - Mounted as environment variables or config files in pods.
 
-### 🔹 Secrets
-- Stored **sensitive data** such as:
-  - Database credentials
-  - Kafka certificates
-  - API keys
-- Accessed securely by pods and encrypted at rest.
+### 🔹 Secrets (For Passwords, API Keys, Certificates)
 
----
+- Sensitive data (like passwords, SSL certs) were stored in Kubernetes Secrets instead of ConfigMaps.
+    - Database credentials
+    - Kafka certificates
+    - API keys
+    - Database passwords (db_password = "s3cr3t")
+    - API keys (stripe_api_key = "sk_test_123")
+    - TLS certificates for HTTPS
+    - Accessed securely by pods and encrypted at rest.
+
+#### Security Features:
+
+- Encrypted at rest (AWS EKS automatically secures them).
+- Never stored in Git (unlike ConfigMaps, which can be versioned).
+- Some teams also used AWS Secrets Manager for extra security.
 
 ## 📈 Scaling
 
-### 🔸 Horizontal Pod Autoscaler (HPA)
+### 🔸 HPA (Autoscaling – Automatically Adding More Pods Under Load)
+
+- Some services (like payment processing) needed to scale up/down based on traffic.
 - Configured based on:
-  - CPU utilization
-  - Memory usage
+    - CPU utilization
+    - Memory usage
+
+#### How HPA Worked?
+
+- If CPU/memory usage went above 70%, Kubernetes automatically added more pods.
+- When traffic dropped, it scaled down to save costs.
+- We set min/max pod limits to avoid overloading the cluster.
 - Automatically scaled pods **up or down** depending on traffic volume.
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: payment-service-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: payment-service
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+```
 
 ---
 
-## 🚀 Deployment Strategy
+## 🚀 Deployment Strategies (Rolling Updates vs. Canary Releases)
 
-### 🔸 Rolling Updates
-- Used Kubernetes `rollingUpdate` strategy.
-- Replaced old pods with new ones **gradually**.
-- Ensured **zero downtime** during deployments.
+### A) Rolling Updates (Default – Zero Downtime)
 
-### 🔸 Canary Testing
-- Used for **critical services** like payment processing.
-- Rolled out new versions to a **small subset of users**.
-- Monitored for errors or performance issues before full rollout.
+- New version slowly replaces old pods, one by one.
+- If something fails, Kubernetes stops the rollout automatically.
 
-### 🔸 GitOps with ArgoCD
-- All Helm charts and manifests stored in a **Git repository**.
-- **ArgoCD** continuously synced desired state from Git to EKS.
-- Provided:
-  - **Declarative deployments**
-  - **Change traceability**
-  - **Audit logging**
+### B) Canary Deployments (For Critical Services)
 
-### Release Cadence
+- First, deploy the new version to only 5% of users.
+- Monitor errors, latency, performance.
+- If everything looks good, roll out to 100%.
+- If something breaks, roll back instantly.
 
-- Nightly Builds: Development environments were updated nightly for rapid iteration.
-- Every 15 days, aligned with Agile sprints, features and fixes were merged into a release branch.
-- The release was validated in QA and UAT environments before production deployment.
-- Canary testing ensured stability before full rollout.
+### 🔸 GitOps with ArgoCD (Automated Deployments from Git)
+
+- Instead of manually running kubectl apply, we used ArgoCD to automatically sync Kubernetes with Git.
+
+#### How It Worked?
+
+- All Kubernetes YAML/Helm charts were stored in a Git repository.
+- ArgoCD watched this repo and applied changes to EKS automatically.
+- If someone changed a file in Git → ArgoCD updated Kubernetes within minutes.
+
+#### Benefits:
+
+✅ No manual deployments (reduces human errors).
+✅ Easy rollbacks (just revert a Git commit).
+✅ Full audit log (who changed what and when).
+
+## How We Released New Software Versions:
+
+### Nightly Test Versions (For Developers)
+
+- Every night, we automatically built a new test version of our software
+- Developers could try these versions the next morning
+- This helped us find and fix problems quickly
+
+### Official Releases (Every 2 Weeks)
+
+- We planned releases to match our 2-week work cycles (called "sprints")
+- At the end of each cycle, we combined all the ready features into a release branch
+- This was like packing up a box of completed work
+
+### Testing Before Going Live
+
+- First, we tested the release in our QA (Quality Assurance) environment
+- Then real users tested it in our UAT (User Acceptance Testing) environment
+- Only after both tests passed did we send it to real customers
+
+### Careful Rollout to Customers
+
+- We first released to a small group of customers (called a "canary release")
+- We watched carefully to make sure nothing broke
+- If everything looked good, we released to everyone
 
 ### Post-Deployment Monitoring
 
@@ -138,3 +227,14 @@
   size significantly.
 - **Learning:** I gained hands-on experience with containerization and Kubernetes manifests, which deepened my
   understanding of cloud-native deployments.
+
+## Final Summary (Simple Flow)
+
+- Developers push code → Jenkins builds Docker image → Pushes to AWS ECR.
+- Helm charts define how the app runs in Kubernetes.
+- ConfigMaps & Secrets store configurations securely.
+- HPA scales pods up/down based on traffic.
+- ArgoCD automatically applies changes from Git → Kubernetes.
+- Rolling updates & canary releases ensure smooth deployments.
+- This setup made our deployments faster, more reliable, and fully automated while keeping everything secure and
+  scalable.

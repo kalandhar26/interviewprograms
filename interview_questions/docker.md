@@ -1,3 +1,13 @@
+# What is Docker?
+- Docker is a platform for developing, shipping, and running applications in lightweight, portable containers. Containers package an application with all its dependencies, ensuring consistency across environments.
+
+## Key Concepts:
+- Images: Read-only templates with instructions for creating containers
+- Containers: Runnable instances of images
+- Dockerfile: Text document with commands to assemble an image
+- Docker Hub: Public registry for Docker images
+- Docker Engine: The core Docker application that runs containers
+
 # Daily Development Commands
 
 | **Command**           | **Description**                          | **Example**                                 |
