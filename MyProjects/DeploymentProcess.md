@@ -5,7 +5,7 @@
 - **Docker** for **containerization**, and
 - **Kubernetes** hosted on AWS EKS for **orchestration**.
 - This process ensures **consistent, reliable deployments** with zero downtime.
-- We follow a bi-weekly release cycle after thorough QA and UAT.
+- We follow a **bi-weekly** release cycle after thorough QA and UAT.
 - My role involved **integrating CI/CD pipelines and Dockerizing microservices**, collaborating closely with the DevOps
   team.
 
@@ -13,59 +13,61 @@
 
 ## 1. Code Development and Version Control
 
-- Developers wrote code for microservices using Java 17 and Spring Boot.
+- As **Developers** wrote code for microservices using Java 17 and Spring Boot.
 - Code was pushed to a Git repository on the main branch for ongoing development or a
   release branch for production.
-- Pull Requests (PRs) were used to review and merge code, ensuring quality through peer reviews.
+- **Pull Requests** (PRs) were used to review and merge code, ensuring quality through peer reviews.
 
 ## 2. CI/CD Pipeline with Jenkins
 
 ### Trigger
 
-- A commit or merge to the main branch triggered the Jenkins pipeline.
-- Jenkins was configured with webhooks to detect changes in the Git repository, initiating the pipeline automatically.
+- A **commit or merge** to the main branch triggered the **Jenkins pipeline**.
+- Jenkins was configured with **webhooks** to detect changes in the Git repository, initiating the pipeline
+  automatically.
 
 ### Build and Test
 
-- Jenkins executed mvn clean package to **compile the code and generate a JAR** file using Maven.
-- Unit tests, written with JUnit, were run to validate functionality (e.g., mvn test).
-- Code quality checks were performed using SonarQube, analyzing metrics like code coverage and technical debt.
+- Jenkins executed **mvn clean package** to **compile the code and generate a JAR** file using Maven.
+- **Unit tests**, written with JUnit, were run to validate functionality (e.g., mvn test).
+- **Code quality** checks were performed using SonarQube, analyzing metrics like code coverage and technical debt.
 - If any test or quality check failed, the pipeline halted, and developers were notified via email or Slack.
 
 ### Docker Image Creation
 
-- Upon successful tests, Jenkins built a Docker image for each microservice using a multi-stage Dockerfile.
-- The image was tagged with a version or latest for development.
-- Images were pushed to Amazon Elastic Container Registry (ECR) using AWS credentials for secure storage.
+- Upon successful tests, Jenkins built a **Docker image** for each microservice using a **Multi-stage Dockerfile**.
+- The image was **Tagged** with a version or latest for development.
+- **Images** were pushed to **Amazon Elastic Container Registry** (ECR) using AWS credentials for secure storage.
 
 ### Dockerization
 
-- Each microservice had its own Dockerfile for consistent environments across dev, staging, and production.
-- We used multi-stage builds to optimize image size, starting with a build stage and copying only the JAR to the runtime
-  stage.
-- The build stage compiled the code and generated the JAR, while the runtime stage used a slim base image for
+- Each microservice had its **Own Dockerfile** for consistent environments across dev, staging, and production.
+- We used **Multi-stage builds** to **optimize image size**, starting with a build stage and copying only the JAR to the
+  runtime stage.
+- The build stage **compiled the code and generated the JAR**, while the runtime stage used a **slim base image** for
   deployment.
-- Images were tested locally using docker run to verify functionality before pushing to ECR.
+- Images were tested **locally** using docker run to verify functionality before pushing to ECR.
 
 ### Kubernetes Deployment on AWS EKS
 
 #### **Orchestration:**
 
-- Kubernetes on EKS pulls the image from ECR and deploys it into pods, which run the microservice.
-- EKS provided a scalable, managed environment for running Kubernetes workloads.
+- Kubernetes on **EKS pulls the image from ECR and deploys it into pods**, which run the microservice.
+- EKS provided a **scalable, managed environment** for running **Kubernetes workloads.**
 
 ## 📦 Deployment Artifacts
 
 ### 🔹 Helm Charts (Like "Templates" for Kubernetes Deployments)
 
-- Instead of writing the same Kubernetes YAML files repeatedly, we used Helm charts, which are like predefined templates
-  for our deployments.
+- Instead of writing the same Kubernetes YAML files repeatedly, we used **Helm charts**, which are like predefined
+  templates for our deployments.
 
 #### Why Helm?
 
-- Reusable Configurations: Each microservice (e.g., order-service, payment-service) had its own Helm chart.
-- Different Environments (Dev/QA/Prod): We could tweak settings (like CPU/memory) per environment using values.yaml.
-- Version Control: Helm allowed us to track changes and roll back if something went wrong.
+- **Reusable Configurations:** Each microservice (e.g., order-service, payment-service) had its own Helm chart.
+- **Different Environments (Dev/QA/Prod):** We could tweak settings (like CPU/memory) per environment using *
+  *values.yaml.**
+- **Version Control:** Helm allowed us to track changes and roll back if something went wrong.
 
 #### When We Used Raw kubectl (Without Helm)
 
@@ -79,7 +81,7 @@ kubectl apply -f deployment.yaml
 
 ### 🔹 ConfigMaps (For Non-Sensitive Configurations)
 
-- Instead of hardcoding settings (like database URLs) inside our Spring Boot app, we stored them in ConfigMaps.
+- Instead of **hardcoding** settings (like database URLs) inside our Spring Boot app, we stored them in **ConfigMaps.**
     - Database connection strings (jdbc:mysql://db-host:3306/orders)
     - Feature flags (enable_new_checkout = true)
     - External service URLs (payment-gateway = https://api.pay.com)
@@ -93,7 +95,7 @@ kubectl apply -f deployment.yaml
 
 ### 🔹 Secrets (For Passwords, API Keys, Certificates)
 
-- Sensitive data (like passwords, SSL certs) were stored in Kubernetes Secrets instead of ConfigMaps.
+- **Sensitive data** (like passwords, SSL certs) were stored in **Kubernetes Secrets** instead of ConfigMaps.
     - Database credentials
     - Kafka certificates
     - API keys
@@ -151,7 +153,7 @@ spec:
 
 ### A) Rolling Updates (Default – Zero Downtime)
 
-- New version slowly replaces old pods, one by one.
+- New version slowly **replaces old pods**, one by one.
 - If something fails, Kubernetes stops the rollout automatically.
 
 ### B) Canary Deployments (For Critical Services)
@@ -163,7 +165,7 @@ spec:
 
 ### 🔸 GitOps with ArgoCD (Automated Deployments from Git)
 
-- Instead of manually running kubectl apply, we used ArgoCD to automatically sync Kubernetes with Git.
+- Instead of manually running kubectl apply, we used ArgoCD to automatically **sync Kubernetes with Git.**
 
 #### How It Worked?
 
