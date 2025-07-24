@@ -1,4 +1,4 @@
-#JVM Architecture Overview
+# JVM Architecture Overview
 
 - The JVM architecture can be divided into several key components, each responsible for specific tasks in the process of
   executing a Java program. These components include the Class Loader Subsystem, Bytecode Verifier, Memory Areas,
