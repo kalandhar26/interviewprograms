@@ -55,3 +55,13 @@
 
 1. Use tools like kafkacat or scripts to produce test messages.
 2. Monitor consumer logs/offsets (consumer-groups CLI).
+
+
+## How do we guarantee that only committed (i.e., fully acknowledged) records ever reach our listener when brokers or producers use transactions?
+- Use the consumer isolation-level setting
+```yaml
+spring:
+  kafka:
+    consumer:
+      isolation-level: read_committed   # default = read_uncommitted
+```
