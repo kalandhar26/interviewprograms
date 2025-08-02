@@ -67,6 +67,7 @@ spring:
     consumer:
       isolation-level: read_committed # default = read_uncommitted
 ```
+
 ---
 
 ## Question 1: What is Kafka and How Does It Work?
@@ -699,3 +700,11 @@ spring:
       sasl.mechanism: AWS_MSK_IAM
       sasl.jaas.config: software.amazon.msk.auth.iam.IAMLoginModule required;
 ```
+
+## Question 23: If There are 2 consumer groups which consume from same topic. Will the message is polled twice? or this is not possible?
+
+- Kafka keeps one offset per (partition, consumer-group).
+- Both groups read the same physical records independently; nothing prevents the broker from sending the same message to both.
+- Each consumer group maintains its own independent offset for every partition of a topic.
+- The broker does not block one group just because another group is already reading that partition.
+  Only within the same consumer group is a partition assigned to exactly one consumer at a time; across different groups, simultaneous access is allowed.
