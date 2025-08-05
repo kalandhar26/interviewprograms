@@ -708,3 +708,119 @@ spring:
 - Each consumer group maintains its own independent offset for every partition of a topic.
 - The broker does not block one group just because another group is already reading that partition.
   Only within the same consumer group is a partition assigned to exactly one consumer at a time; across different groups, simultaneous access is allowed.
+
+## Question 24: What are the key properties of Kafka Producer?
+
+```java
+Properties props = new Properties();
+props.put("bootstrap.servers", "broker1:9092,broker2:9092");
+props.put("acks", "all");
+props.put("retries", 3);
+props.put("batch.size", 16384);
+props.put("linger.ms", 20);
+props.put("buffer.memory", 33554432);
+props.put("compression.type", "snappy");
+props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+KafkaProducer<String, String> producer = new KafkaProducer<>(props);
+```
+
+- **acks:** Controls when the producer considers a message "sent" successfully.
+- acks=0 : No acknowledgment. Fire-and-forget. where some data loss is acceptable.
+- acks=1 : Leader acknowledges receipt. Good for most apps where some durability is needed.
+- acks=all : Leader + all ISRs (in-sync replicas) acknowledge.where no loss is acceptable.
+- **retries & retry.backoff.ms** Handles transient failures, broker down, network issues
+- retries: Number of retries (default: 0). Set to Integer.MAX_VALUE for mission-critical apps.
+- retry.backoff.ms: Delay between retries (default: 100ms). Adjust based on broker recovery time.
+- **bootstrap.servers** List of Kafka brokers for initial connection.
+- **buffer.memory & batch.size** Controls batching for throughput optimization.
+- buffer.memory : Total memory for unsent messages (default: 32MB).
+- batch.size: Max bytes per batch (default: 16KB).
+- linger.ms : Max time to wait for batch filling (default: 0). Set to 5-100ms for better batching.
+- **max.in.flight.requests.per.connection** Controls how many unacknowledged requests can be in flight.
+- When the value is 1 , 1 Strict ordering (no retry reordering). Exactly-once semantics (e.g., transactions)
+- 5 (default) Higher throughput, but possible reordering. High-throughput apps where order isn’t critical.
+- **compression.type** Compresses messages before sending.
+- none (default) - - Low CPU, high network usage.
+- gzip High High Best for high-latency apps (archival).
+- snappy Medium Low Balanced (logs, metrics).
+- lz4 Medium Very Low Best for low-latency apps.
+- zstd Very High Medium Best for Kafka 2.1+.
+- **enable.idempotence** Ensures exactly-once delivery (no duplicates)
+- false (default) Possible duplicates on retries. Default for most apps.
+- true No duplicates even with retries. Financial transactions, orders.
+- **transactional.id** Enables atomic writes across partitions/topics.
+- **request.timeout.ms & delivery.timeout.ms** Controls how long producer waits for a response.
+- request.timeout.ms Timeout per request (default: 30s). Increase in slow networks.
+- delivery.timeout.ms Total time for send + retries (default: 2m). Must be > linger.ms + request.timeout.ms.
+- **key.serializer & value.serializer** Serializers for keys and values.
+- **producer tuning**
+  | Goal | Key Configs |
+  | ------------------ | -------------------------------------------------------------------------- |
+  | Maximum Durability | `acks=all`, `enable.idempotence=true`, `retries=MAX_INT` |
+  | Maximum Throughput | `acks=1`, `linger.ms=20`, `batch.size=64KB`, `compression.type=snappy/lz4` |
+  | Lowest Latency | `acks=0`, `linger.ms=0`, `batch.size=1` |
+  | Exactly-Once | `enable.idempotence=true`, `max.in.flight=1`, `acks=all` |
+
+## Question 25: What are the key properties of Kafka Consumer?
+
+```java
+Properties props = new Properties();
+props.put("bootstrap.servers", "broker1:9092,broker2:9092");
+props.put("group.id", "order-processing-group");
+props.put("auto.offset.reset", "earliest");
+props.put("enable.auto.commit", "false");
+props.put("max.poll.records", "100");
+props.put("session.timeout.ms", "30000");
+props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
+KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+consumer.subscribe(Collections.singletonList("orders"));
+
+while (true) {
+    ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+    for (ConsumerRecord<String, String> record : records) {
+        System.out.printf("Received: key=%s, value=%s%n", record.key(), record.value());
+    }
+    consumer.commitSync(); // Manual offset commit
+}
+```
+
+- **group.id** Identifies the consumer group for coordination and offset tracking.
+- Consumers in the same group share partitions. Load balancing (multiple consumers processing different partitions)
+- Each group maintains its own offset. Different apps consuming the same topic independently.
+- **auto.offset.reset (Offset Behavior)** What to do when no offset is committed
+- earliest Start from the oldest message. Replay all data (e.g., analytics).
+- latest (default) Start from new messages. Real-time apps
+- none Throw exception if no offset exists. Strict offset control.
+- **enable.auto.commit (Offset Management)** Whether to auto-commit offsets (can lead to duplicates).
+- true (default) Automatically commit offsets periodically. Best-effort processing (some duplicates allowed).
+- false Manual offset commits (commitSync()/commitAsync()). Exactly-once processing (critical apps).
+- **max.poll.records (Batch Size)** Max records returned in a single poll() call.
+- Smaller batches → Lower latency. Real-time apps.
+- Larger batches → Higher throughput. Batch processing.
+- **max.poll.interval.ms (Consumer Liveness)** Max time between poll() calls before being considered dead.
+- **session.timeout.ms & heartbeat.interval.ms (Consumer Health)**
+- session.timeout.ms (default: 10s) Time to detect consumer failure. Adjust for slow networks.
+- heartbeat.interval.ms (default: 3s) How often to send heartbeats. Must be < session.timeout.ms / 3.
+- **fetch.min.bytes & fetch.max.wait.ms** Control how much data is fetched per request.
+- fetch.min.bytes (default: 1) Min bytes to wait for.
+- fetch.max.wait.ms (default: 500) Max time to wait for fetch.min.bytes.
+- **isolation.level (Read Committed)** Control visibility of transactional messages.
+- read_uncommitted (default) See all messages (even aborted ones)
+- read_committed Only see committed messages.
+- **partition.assignment.strategy (Rebalance Control)**
+- Range (default) Static range-based assignment. Simple but can be unbalanced.
+- RoundRobin Evenly distributes partitions. Better for small consumer groups.
+- Sticky Minimizes reassignment. Best for frequent rebalances.
+- **key.deserializer & value.deserializer** Deserializers for keys and values.
+
+- **consumer Tuning**
+  | Goal | Key Configs |
+  | ----------------------- | --------------------------------------------------------------|
+  | Exactly-Once Processing | `enable.auto.commit=false`, `isolation.level=read_committed` |
+  | High Throughput | `fetch.min.bytes=1MB`, `max.poll.records=500` |
+  | Low Latency | `fetch.min.bytes=1`, `max.poll.records=1` |
+  | Avoid Rebalance Issues | `session.timeout.ms=30s`, `max.poll.interval.ms=5m` |
