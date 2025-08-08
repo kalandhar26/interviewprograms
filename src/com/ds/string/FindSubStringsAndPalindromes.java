@@ -1,6 +1,12 @@
+package com.ds.string;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
+
 public class FindSubStringsAndPalindromes {
 
-    public static void main(Strings[] args){
+    public static void main(String[] args){
         String input = "madam";
         System.out.println(getPalindromesFromString(input));
         System.out.println(getSubstringFromString(input));
@@ -24,10 +30,5 @@ public class FindSubStringsAndPalindromes {
             }
         }
         return results;
-    }
-}
-
-)
-        }
     }
 }

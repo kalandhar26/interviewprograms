@@ -1,7 +1,11 @@
+package com.ds.Arrays;
+
+import java.util.*;
+
 public class NonAdjacentMaxSum {
  public static void main(String[] args){
 
-    int[] array = {8,6,2,5,1,4,3}
+    int[] array = {8,6,2,5,1,4,3};
     System.out.println(nonAdjMaxSum(array));
 
  }

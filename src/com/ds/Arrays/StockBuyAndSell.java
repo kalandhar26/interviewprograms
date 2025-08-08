@@ -6,7 +6,8 @@ public class StockBuyAndSell {
 
         int array[] = {3,2,6,5,0,3};
 
-        System.out.println(maxprofit1Time(array));
+        System.out.println(maximumProfit(array));
+        System.out.println(maxProfitByBuyingAndSellingOnce(array));
     }
 
     public static int maximumProfit(int[] array) {
@@ -19,15 +20,15 @@ public class StockBuyAndSell {
         return profit;
     }
 
-    public static int maxprofit1Time(int[] prices) {
-        int minimum=prices[0];
-        int maximum=0;
+    public static int maxProfitByBuyingAndSellingOnce(int[] prices) {
+        int minimumPrice=prices[0];
+        int maximumProfit=0;
 
         for(int i=0;i<prices.length;i++){
-            minimum = Math.min(prices[i],minimum);
-            maximum = Math.max(maximum,prices[i]-minimum);
+            minimumPrice = Math.min(prices[i],minimumPrice);
+            maximumProfit = Math.max(maximumProfit,prices[i]-minimumPrice);
         }
 
-        return maximum;
+        return maximumProfit;
     }
 }

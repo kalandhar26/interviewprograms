@@ -12,13 +12,13 @@ public class TwoSum {
         int[] array = {3,3};
         int target = 6;
 
-        int[] result = twoSum(array,target);
+        int[] result = twoSum1(array,target);
 
         for(int x : result){
             System.out.println(x);
         }
 
-      Arrays.stream(array).boxed().collect(Collectors.groupingBy(n->n,Collectors.counting())).entrySet().stream().filter(entry -> entry.getValue()==1).map(Map.Entry::getKey).mapToInt(Integer::valueOf).forEach(System.out::println);
+    //  Arrays.stream(array).boxed().collect(Collectors.groupingBy(n->n,Collectors.counting())).entrySet().stream().filter(entry -> entry.getValue()==1).map(Map.Entry::getKey).mapToInt(Integer::valueOf).forEach(System.out::println);
     }
 
     // Normal Solution
@@ -47,8 +47,12 @@ public class TwoSum {
         for(int i=0;i< nums.length;i++){
             int x = target-nums[i];
             if(map.containsKey(x)){
-                map.put(x,i);
+              int  index0 = map.get(x);
+                resultArray[0] = nums[index0];
+                resultArray[1] = nums[i];
+                return resultArray;
             }
+            map.put(nums[i],i);
         }
 
         return resultArray;
