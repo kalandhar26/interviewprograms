@@ -1,15 +1,20 @@
 package com.ds.Arrays;
 
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
 public class MoveZerosToStart {
 
     public static void main(String[] args) {
 
-        int array[] = {20, 20, 0, 0, 0, 20, 5};
+        int[] array = {20, 20, 0, 0, 0, 20, 5};
 
-        int[] zerosToEnd = moveZeroToStart(array);
+        int[] zerosToStart = moveZeroToStart(array);
+        int[] zerosToStartt = moveZerosToStartt(array);
 
-        for (int x : zerosToEnd)
-            System.out.print(x + " ");
+        System.out.println(Arrays.toString(zerosToStart));
+        System.out.println(Arrays.toString(zerosToStartt));
+
 
     }
 
@@ -28,5 +33,14 @@ public class MoveZerosToStart {
         }
 
         return array;
+    }
+
+    public static int[] moveZerosToStartt(int[] array) {
+        return IntStream.concat(
+                Arrays.stream(array).filter(n -> n==0),
+                Arrays.stream(array).filter(n -> n!=0)
+        ).toArray();
+
+
     }
 }

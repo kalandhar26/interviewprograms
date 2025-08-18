@@ -47,3 +47,26 @@
 | Running with environment variables (for application.yml) | `docker run -e "SPRING_PROFILES_ACTIVE=prod" -e "DB_URL=jdbc:mysql://host:3306/db" my-spring-app:1.0`                                              |
 | Health check for microservices                           | `docker inspect --format='{{json .State.Health}}' <container-id>`                                                                                  |
 
+## Sample Docker file
+
+```Dockerfile
+# ---------- Build stage ----------
+FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /workspace
+COPY pom.xml .
+COPY src ./src
+RUN mvn -B -q package -DskipTests
+
+# ---------- Runtime stage ----------
+FROM gcr.io/distroless/java21-debian12:nonroot
+WORKDIR /app
+COPY --from=build /workspace/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+## Multi Staged Docker file
+
+```yaml
+
+```

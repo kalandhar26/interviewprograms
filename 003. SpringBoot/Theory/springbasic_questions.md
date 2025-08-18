@@ -1,7 +1,7 @@
 ## **1. Why Constructor Injection is preferred over Setter Injection?**
 
-- Construction Injection is enables Immutability and ThreadSafe as it enables final fields. objects become immutable
-  after construction. prevents accidental modification after initilization.
+- Construction Injection enables Immutability and ThreadSafe as it enables final fields. objects become immutable
+  after construction. prevents accidental modification after initialization.
 - Constructor guarantees all dependencies are provided. Constructor injection fails fast if circular dependencies exist
 
 ## **2. Why Spring Boot Over Spring?**
@@ -51,6 +51,41 @@
 - Testing: Update tests for new APIs and Testcontainers integration.
 - Micrometer 1.10+ & Observability API (replaced Sleuth, supports OpenTelemetry).
 - Declarative HTTP Interface (replaces RestTemplate/Feign).
+
+## How Springboot Auto Configuration Works internally?
+
+- Springboot uses @EnableAutoConfiguration and spring.factories file to load auto-configuration classes using
+  AutoConfigurationImportSelector.
+
+## Can you tell me about @SpringBootApplication annotation?
+
+- @SpringBootApplication is a meta annotation that includes @ComponentScan, @Configuration and @Enable Configuration.
+
+## How do you customize auto configuration?
+
+- We can use @ConditionalOnProperty, @ConditionalOnClass in custom configuration classes?
+
+## How do you override default properties in Springboot?
+
+- use application.properties, application.yml or pass as JVM arguments. It also loads external configuration properties
+  using application.properties , JVM arguments, command line args and @PropertySource.
+
+## Explain Springboot actuators and its use cases? How do you implement custom actuator endpoints?
+
+- Actuator provides production ready features like metrics, health checks and info end points.
+- custom end point
+
+```java
+
+@Component
+@Endpoint(id = "custom")
+public class CustomEndPoint {
+    @ReadOperation
+    public String getData() {
+        return "Custom Endpoint Data";
+    }
+} 
+```
 
 ## Define Spring Dependency Injection?
 
@@ -111,3 +146,93 @@
 - **HTTP Version**: Protocol version (e.g., HTTP/1.1).
 - **Response Headers**: Metadata (e.g., Content-Type: application/json, Cache-Control: no-store).
 - **Response Body (Optional)**:Contains the requested data or error details (e.g., JSON response).
+
+## How do Spring Profiles work ?
+
+- Use @Profile annotation and application-{Profile}.properties to configure environments.
+
+## How do you secure a Springboot Rest API using JWT Token?
+
+- We use filters to intercept requests and validate JWT Tokens using libraries like jjwt.
+
+## difference between @ConfigurationProperties and @Value?
+
+- @Value is for single value injection.
+- @ConfigurationProperties binds an entire POJO to configuration.
+
+## How do you customize embedded Tomcat server in springboot?
+
+- We need to Implement WebServerFactoryCustomizer
+
+```java
+
+@Bean
+public WebServerFactoryCustomizer<TomcatServletWebServerFactory> customizer() {
+    return factory -> factory.setPort(8080);
+}
+```
+
+## How do you create a custom starter in Springboot?
+
+- Create a library module
+- Add META-INF/spring.factories or spring/org.springframewrok.boot.configure.AutoConfiguration.imports
+- provide autoconfiguration classes
+
+```java
+
+@Configuration
+public class MyLibraryAutoConfiguration {
+    @Bean
+    public MyService myService() {
+        return new MyService();
+    }
+}
+```
+
+- spring.factories:
+
+```properties
+org.springframework.boot.autoconfigure.EnabledAutoConfiguration=\com.example.MyLibraryAutoConfiguration
+```
+
+## How do you handle circular dependencies in sprinboot?
+
+- Spring boot tries to resolve circular dependencies via setter injection or @Lazy annotation.
+- Construction injection with circular dependencies will fail fast.
+- spring.main.allow-circular-references=true in properties (this is not recommended for production lead to runtime
+  issues)
+
+## How do you expose a springboot microservices over HTTPs?
+
+- Add SSL cert (JKS file)
+- configure application.properties
+
+```properties
+server.port=8080
+server.ssl.enabled=true
+server.ssl.key-store=classpath:keystore.jks
+server.ssl.key-store-password={PASSWORD}
+server.ssl.key-store-type=JKS
+```
+
+## How will you reduce springboot startup time?
+
+- use lazy initialization (spring.main.lazy-initialization=true)
+- Remove unused starters
+- Enable parallel classpath scanning
+- Profile slow beans via actuator.
+
+## How do you implement a scheduled task with dynamic cron expression?
+
+- Use @Scheduled with a dynamic expression from a bean or DB using **SchedulingConfigurer**
+
+## Interceptors Vs Filters
+
+- Interceptors (from Spring MVC) and Filters (from Servlet API) allow pre/post-processing of HTTP requests, but they
+  operate at different layers and serve different purpose.
+- Filters operate at the lowest level (Servlet container, before the request reaches Spring).
+- Filters can modify requests/responses (headers, body, etc.).
+- Filters cannot access to Spring context (e.g., @Autowired beans).
+- Inceptor operate after Filters but before Controllers.
+- Inceptors have access to Spring context (e.g., @Autowired dependencies).
+- Interceptors can modify the model/view (but not the raw request/response).

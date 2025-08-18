@@ -8,3 +8,4 @@
 - Spring encourages stateless beans, which are inherently thread-safe. For stateful beans, use prototype scope or
   synchronization. Spring's core container and tools like RequestContextHolder or @Transactional are thread-safe, but
   developers must ensure thread safety for mutable bean state.
+
