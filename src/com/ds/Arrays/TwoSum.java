@@ -57,4 +57,25 @@ public class TwoSum {
 
         return resultArray;
     }
+
+    public  static  int[] twoSum2(int[] array, int target) {
+        Arrays.sort(array);
+        int n = array.length;
+        for (int i = 1; i < n; i++) {
+            if (array[i] == array[i - 1]) continue;
+
+            int left = i + 1;
+            int sum = array[i] + array[left];
+
+            while (left < n) {
+                if (sum == target) {
+                    return new int[]{array[i], array[left]};
+                } else if (sum < target) {
+                    left++;
+                }
+            }
+        }
+        return new int[0];
+    }
+
 }

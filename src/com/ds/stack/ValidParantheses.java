@@ -8,11 +8,11 @@ public class ValidParantheses {
 
     public static void main(String[] args) {
         String input = "[{()}]";
-        System.out.println(isValidParanthesis(input));
+        System.out.println(isValidParenthesis(input));
         System.out.println(isValidParanthes(input));
     }
 
-    public static boolean isValidParanthesis(String input) {
+    public static boolean isValidParenthesis(String input) {
         Stack<Character> stack = new Stack<>();
 
         for (int i = 0; i < input.length(); i++) {
