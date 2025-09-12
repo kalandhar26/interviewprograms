@@ -27,6 +27,25 @@ public class AnagramCheck {
 
         return Arrays.equals(chars1,chars2);
 
+    }
+
+    public static boolean areAnagrams1(String input1, String input2){
+        int[] result = new int[26];
+
+        if(input1.length() != input2.length())
+            return false;
+
+        for(int i=0;i<input1.length();i++){
+            result[input1.charAt(i)-'a']++;
+            result[input2.charAt(i)-'a']--;
+        }
+
+        for (int j : result) {
+            if (j != 0)
+                return false;
+        }
+
+        return true;
 
     }
 

@@ -23,8 +23,5 @@ public class FirstRepeatativeAndNonRepeatativeCharacterInaString {
 
         System.out.println(value1);
 
-
-
-
     }
 }

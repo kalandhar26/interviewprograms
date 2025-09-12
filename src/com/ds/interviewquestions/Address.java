@@ -26,6 +26,15 @@ public class Address {
             this.country = country;
         }
 
+    public Address(Address address) {
+        this.id = address.id;
+        this.street = address.street;
+        this.city = address.city;
+        this.state = address.state;
+        this.country = address.country;
+    }
+
+
     public Integer getId() {
         return id;
     }
