@@ -40,7 +40,7 @@
 - Traditional Spring requires additional configuration for microservices patterns.
 - Spring Boot is designed with microservices in mind, offering tools like Spring Cloud for distributed systems.
 
-## Springboot 2.x vs Springboot 3.x?
+## 3. Springboot 2.x vs Springboot 3.x?
 
 **Upgrading from Spring Boot 2.x to 3.x requires careful planning:**
 
@@ -52,25 +52,25 @@
 - Micrometer 1.10+ & Observability API (replaced Sleuth, supports OpenTelemetry).
 - Declarative HTTP Interface (replaces RestTemplate/Feign).
 
-## How Springboot Auto Configuration Works internally?
+## 4. How Springboot Auto Configuration Works internally?
 
 - Springboot uses @EnableAutoConfiguration and spring.factories file to load auto-configuration classes using
   AutoConfigurationImportSelector.
 
-## Can you tell me about @SpringBootApplication annotation?
+## 5. Can you tell me about @SpringBootApplication annotation?
 
 - @SpringBootApplication is a meta annotation that includes @ComponentScan, @Configuration and @Enable Configuration.
 
-## How do you customize auto configuration?
+## 6. How do you customize auto configuration?
 
 - We can use @ConditionalOnProperty, @ConditionalOnClass in custom configuration classes?
 
-## How do you override default properties in Springboot?
+## 7. How do you override default properties in Springboot?
 
 - use application.properties, application.yml or pass as JVM arguments. It also loads external configuration properties
   using application.properties , JVM arguments, command line args and @PropertySource.
 
-## Explain Springboot actuators and its use cases? How do you implement custom actuator endpoints?
+## 8. Explain Springboot actuators and its use cases? How do you implement custom actuator endpoints?
 
 - Actuator provides production ready features like metrics, health checks and info end points.
 - custom end point
@@ -87,7 +87,7 @@ public class CustomEndPoint {
 } 
 ```
 
-## Define Spring Dependency Injection?
+## 9. Define Spring Dependency Injection?
 
 - Dependency Injection (DI) is a design pattern used in object-oriented programming to implement Inversion of Control (
   IoC), where the control of creating and managing dependencies is transferred from the class to an external framework
@@ -96,18 +96,18 @@ public class CustomEndPoint {
 - The container injects dependencies into a class at runtime, based on configuration (e.g., annotations, XML, or Java
   config).
 
-## What is Inversion Of Control?
+## 10. What is Inversion Of Control?
 
 - Instead of a class creating its own dependencies (e.g., using the new keyword), the dependencies are provided ("
   injected") by an external entity, typically a framework like Spring.
 
-## How are HTTP methods Categorized?
+## 11. How are HTTP methods Categorized?
 
 - **Safe Methods (e.g., GET, HEAD)** – Only retrieve data, no server changes.
 - **Idempotent Methods (e.g., PUT, DELETE)** – Repeated requests have the same effect as one.
 - **Non-Idempotent Methods (e.g., POST, PATCH)** – Each request may cause different effects.
 
-## How are HTTP Status Categorized?
+## 12. How are HTTP Status Categorized?
 
 -### **HTTP Status Code Categories**
 
@@ -117,7 +117,7 @@ public class CustomEndPoint {
 4. **4xx (Client Error)** – Request contains an error (e.g., invalid data).
 5. **5xx (Server Error)** – Server failed to fulfill a valid request.
 
-## What is Statelessness in RESTful Web Services?
+## 13. What is Statelessness in RESTful Web Services?
 
 - Statelessness means the server does not store any client state between requests. Each request from the client must
   contain all necessary information for the server to process it.
@@ -128,11 +128,11 @@ public class CustomEndPoint {
 - Instead of server-stored sessions, the client sends an authentication token (JWT) in each request.
 - The server validates the token without storing session data.
 
-## What is Addressing in RESTful Web Services?
+## 14. What is Addressing in RESTful Web Services?
 
 - Addressing refers to how resources are located and identified on the server using URIs (Uniform Resource Identifiers).
 
-## What are core Components of an HTTP Request?
+## 15. What are core Components of an HTTP Request?
 
 - **HTTP Method (Verb)**: Defines the action (e.g., GET, POST, PUT, DELETE).
 - **URI (Uniform Resource Identifier)**: Identifies the resource (e.g., /api/users/123).
@@ -140,27 +140,27 @@ public class CustomEndPoint {
 - **Request Headers**: Metadata in key-value pairs (e.g., Content-Type: application/json, Authorization: Bearer token).
 - **Request Body (Optional)**:Contains data sent to the server (e.g., JSON payload for POST/PUT).
 
-## What are Core Components of an HTTP Response
+## 16. What are Core Components of an HTTP Response
 
 - **Status Code**: Indicates request success/failure (e.g., 200 OK, 404 Not Found, 500 Server Error).
 - **HTTP Version**: Protocol version (e.g., HTTP/1.1).
 - **Response Headers**: Metadata (e.g., Content-Type: application/json, Cache-Control: no-store).
 - **Response Body (Optional)**:Contains the requested data or error details (e.g., JSON response).
 
-## How do Spring Profiles work ?
+## 17.How do Spring Profiles work ?
 
 - Use @Profile annotation and application-{Profile}.properties to configure environments.
 
-## How do you secure a Springboot Rest API using JWT Token?
+## 18.How do you secure a Springboot Rest API using JWT Token?
 
 - We use filters to intercept requests and validate JWT Tokens using libraries like jjwt.
 
-## difference between @ConfigurationProperties and @Value?
+## 19. difference between @ConfigurationProperties and @Value?
 
 - @Value is for single value injection.
 - @ConfigurationProperties binds an entire POJO to configuration.
 
-## How do you customize embedded Tomcat server in springboot?
+## 20. How do you customize embedded Tomcat server in springboot?
 
 - We need to Implement WebServerFactoryCustomizer
 
@@ -172,7 +172,7 @@ public WebServerFactoryCustomizer<TomcatServletWebServerFactory> customizer() {
 }
 ```
 
-## How do you create a custom starter in Springboot?
+## 21. How do you create a custom starter in Springboot?
 
 - Create a library module
 - Add META-INF/spring.factories or spring/org.springframewrok.boot.configure.AutoConfiguration.imports
@@ -195,14 +195,14 @@ public class MyLibraryAutoConfiguration {
 org.springframework.boot.autoconfigure.EnabledAutoConfiguration=\com.example.MyLibraryAutoConfiguration
 ```
 
-## How do you handle circular dependencies in sprinboot?
+## 22. How do you handle circular dependencies in sprinboot?
 
 - Spring boot tries to resolve circular dependencies via setter injection or @Lazy annotation.
 - Construction injection with circular dependencies will fail fast.
 - spring.main.allow-circular-references=true in properties (this is not recommended for production lead to runtime
   issues)
 
-## How do you expose a springboot microservices over HTTPs?
+## 23. How do you expose a springboot microservices over HTTPs?
 
 - Add SSL cert (JKS file)
 - configure application.properties
@@ -215,18 +215,18 @@ server.ssl.key-store-password={PASSWORD}
 server.ssl.key-store-type=JKS
 ```
 
-## How will you reduce springboot startup time?
+## 24. How will you reduce springboot startup time?
 
 - use lazy initialization (spring.main.lazy-initialization=true)
 - Remove unused starters
 - Enable parallel classpath scanning
 - Profile slow beans via actuator.
 
-## How do you implement a scheduled task with dynamic cron expression?
+## 25. How do you implement a scheduled task with dynamic cron expression?
 
 - Use @Scheduled with a dynamic expression from a bean or DB using **SchedulingConfigurer**
 
-## Interceptors Vs Filters
+## 26. Interceptors Vs Filters
 
 - Interceptors (from Spring MVC) and Filters (from Servlet API) allow pre/post-processing of HTTP requests, but they
   operate at different layers and serve different purpose.
@@ -236,3 +236,36 @@ server.ssl.key-store-type=JKS
 - Inceptor operate after Filters but before Controllers.
 - Inceptors have access to Spring context (e.g., @Autowired dependencies).
 - Interceptors can modify the model/view (but not the raw request/response).
+
+## 27. How does spring manage thread safety of its beans?
+
+- Spring manages bean thread safety based on their scope:
+- Singleton (default): One instance shared across the app. Not thread-safe if stateful; developers must use
+  synchronization or make them stateless for safety.
+- Prototype: New instance per request, generally thread-safe as each thread gets its own copy.
+- Request/Session: Web-specific scopes create instances per HTTP request or session, safe within their context.
+- Spring encourages stateless beans, which are inherently thread-safe. For stateful beans, use prototype scope or
+  synchronization. Spring's core container and tools like RequestContextHolder or @Transactional are thread-safe, but
+  developers must ensure thread safety for mutable bean state.
+
+## 28. How to get number of beans in project?
+
+- o get the number of beans managed by the Spring Boot application context, you can use the ApplicationContext interface
+  which provides access to all Spring beans
+- Using Actuator Endpoints If using Spring Boot Actuator, you can check bean info via
+  HTTP (http://localhost:8080/actuator/beans)
+
+```java
+
+@Component
+public class BeanCounter {
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    public int getNumberOfBeans() {
+        // Returns the count of all bean definition names in the context
+        return applicationContext.getBeanDefinitionNames().length;
+    }
+} 
+```
