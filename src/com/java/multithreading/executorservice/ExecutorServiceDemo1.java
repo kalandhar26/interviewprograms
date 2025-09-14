@@ -15,7 +15,8 @@ public class ExecutorServiceDemo1 {
             executorService.execute(new Service(i));
         }
         executorService.shutdown();
-        executorService.awaitTermination(10, TimeUnit.SECONDS);
+        boolean b = executorService.awaitTermination(10, TimeUnit.SECONDS);
+        System.out.println(b);
         System.out.println(LocalDateTime.now());
     }
 }

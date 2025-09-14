@@ -15,7 +15,7 @@ public class CompletableFutureDemo2 {
                         Thread.sleep(5000);
                         System.out.println(Thread.currentThread().getName() + " Inside Completable Future 2");
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        System.out.println(e.getMessage());
                     }
                     return "data from supplyAsync() !!";
                 });
