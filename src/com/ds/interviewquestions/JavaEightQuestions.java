@@ -16,12 +16,11 @@ public class JavaEightQuestions {
 
         System.out.println("==========Print Maximum Salary from Collection=================");
         Employee employee = employeeList.stream().max(Comparator.comparingDouble(Employee::getSalary)).get();
-        System.out.println(employee.toString());
+        System.out.println(employee);
 
         System.out.println("==========Print Minimum Salary from Collection=================");
-
         Employee employee1 = employeeList.stream().min(Comparator.comparingDouble(Employee::getSalary)).get();
-        System.out.println(employee1.toString());
+        System.out.println(employee1);
 
         System.out.println("==========Print Max or Min Salary From Each Department=================");
         Map<Integer, Optional<Employee>> collect = employeeList.stream().collect(Collectors.groupingBy(Employee::getDeptid, Collectors.maxBy(Comparator.comparingDouble(Employee::getSalary))));
@@ -86,7 +85,7 @@ public class JavaEightQuestions {
         System.out.println("=========================== 2nd Highest Paid Employee =============");
         Optional<Employee> secondHighestpaidEmployee = employeeList.stream().sorted(Comparator.comparingDouble(Employee::getSalary)).skip(1).findFirst();
         employeeList.stream().mapToDouble(Employee::getSalary).distinct().boxed().sorted(Double::compare).skip(1).findFirst();
-        System.out.println("2nd ====$%^"+secondHighestpaidEmployee.toString());
+        System.out.println("2nd ====$%^" + secondHighestpaidEmployee.toString());
 
         System.out.println("=========================== Highest Paid Employee Gender wise =============");
 
@@ -161,7 +160,7 @@ public class JavaEightQuestions {
 
         System.out.println("========================== find dulicate passout years ==========================");
 
-       employeeList.stream()
+        employeeList.stream()
                 .map(Employee::getPassedOutyear).filter(passedOutyear -> employeeList
                         .stream()
                         .filter(passoutyear -> passoutyear.getPassedOutyear() == passedOutyear).count() > 1
@@ -170,17 +169,17 @@ public class JavaEightQuestions {
         System.out.println("==================== Generate List of Minor and Major ===================");
         Map<Boolean, List<Employee>> collect17 = employeeList.stream().collect(Collectors.partitioningBy(emp -> emp.getAge() > 18));
 
-        for(Map.Entry<Boolean, List<Employee>> entry : collect17.entrySet()){
-            if(entry.getKey()){
+        for (Map.Entry<Boolean, List<Employee>> entry : collect17.entrySet()) {
+            if (entry.getKey()) {
                 System.out.println(" =======Employees who are majors=========");
                 System.out.println(entry.getValue());
-            }else {
+            } else {
                 System.out.println("========== Minor Employees===============");
                 System.out.println(entry.getValue());
             }
 
             List<Employee> list1 = entry.getValue();
-            for(Employee e : list1){
+            for (Employee e : list1) {
                 System.out.println(e.getName());
             }
         }
@@ -189,7 +188,7 @@ public class JavaEightQuestions {
         System.out.println("============== Employees Hobbies =======================");
         List<String> collect18 = employeeList.stream().map(Employee::getHobbies).flatMap(List::stream).distinct().toList();
 
-        for(String list1 : collect18){
+        for (String list1 : collect18) {
             System.out.println(list1);
         }
 
@@ -198,7 +197,6 @@ public class JavaEightQuestions {
         double v = employeeList.stream().mapToDouble(Employee::getAge).sum();
         System.out.println(v);
         // =====================  End  =============================
-
 
 
     }

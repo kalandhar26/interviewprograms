@@ -18,7 +18,7 @@ public class FindSubStringsAndPalindromes {
         .boxed()
         .flatMap(i -> IntStream.range(i+1, input.length()+1)
             .mapToObj(j->input.substring(i,j)))
-        .filter(word -> word.length() > 1 && word.equals(new StringBuilder(word).reverse().toString())).toList();
+        .filter(word -> word.length() > 1 && word.contentEquals(new StringBuilder(word).reverse())).toList();
     }
 
     public static List<String> getSubstringFromString(String input){
