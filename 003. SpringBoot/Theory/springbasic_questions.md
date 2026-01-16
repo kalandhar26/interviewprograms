@@ -9,7 +9,7 @@
 **Simplified Configuration:**
 
 - Spring requires extensive XML or Java-based configuration
-- pring Boot uses convention over configuration. Auto-configuration based on classpath dependencies, reducing
+- Spring Boot uses convention over configuration. Auto-configuration based on classpath dependencies, reducing
   boilerplate code.
 
 **Embedded Servers:**
@@ -67,7 +67,8 @@
 
 ## 7. How do you override default properties in Springboot?
 
-- use application.properties, application.yml or pass as JVM arguments. It also loads external configuration properties
+- use application.properties, application.yml or pass as JVM arguments. 
+- It also loads external configuration properties
   using application.properties , JVM arguments, command line args and @PropertySource.
 
 ## 8. Explain Springboot actuators and its use cases? How do you implement custom actuator endpoints?

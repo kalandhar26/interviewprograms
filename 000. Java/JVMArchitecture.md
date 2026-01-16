@@ -16,12 +16,13 @@
 
 - The Class Loader Subsystem is responsible for loading, linking, and initializing the .class files (bytecode) into the
   JVM's memory. It performs three main activities: Loading, Linking, and Initialization.
+- A class loader in java is part of JRE that dynamically loads classes into memory at run time. It reads the .class
+  files (bytecode) and loads them into JVM.
 
 ### Loading
 
 - The loading phase involves reading the .class files and creating corresponding class structures in memory. The JVM
-  uses
-  three types of class loaders, each with specific responsibilities:
+  uses three types of class loaders, each with specific responsibilities:
 
 #### Bootstrap Class Loader:
 
@@ -36,8 +37,10 @@
 - Responsible for loading optional packages or extensions to the core Java libraries.
 - Application Class Loader (also called System Class Loader):
 - Loads classes from the application's classpath, which includes user-defined classes and libraries specified via the
-  -cp
-  or CLASSPATH environment variable.
+  -cp or CLASSPATH environment variable.
+
+#### System Class Loader
+- Loads classes from System classpath.
 
 ### Linking
 
@@ -136,3 +139,33 @@
   optimize frequently executed methods.
 - **Garbage Collection:** The Garbage Collector manages memory by reclaiming unused objects.
 - **Native Interactions:** JNI and native libraries handle platform-specific tasks when needed.
+
+# How does java handle memory management and garbage collection?
+
+- Java manages memory using automatic garbage collection, which frees up memory by removing objects that are no longer
+  reachable or used, help preventing memory Leaks.
+
+## Types of garbage collection
+
+- Serial Collector : Works in single threaded, used in small applications with limited resources.
+- Parallel Collector : Uses Multi Threaded , Good for medium to large application that needs faster performance.
+- G1 Collector: Used in large applications with large amount of memory and processors, splits memory into regions for
+  efficient clean up.
+
+# What is reflection in java?
+
+- Reflection allows java programs to inspect and manipulate classes, methods, fields and constructors at run time, even
+  if their names are unknown at compile time.
+- Using reflection we can find out which class an object belongs to, can access methods and run then even if they are
+  private.
+- Get details like class name, constructors and methods.
+
+```java
+Class<?> clazz = Class.forName("java.util.ArrayList");
+System.out.
+
+println("Class Name: "+clazz.getName());
+```
+
+- This loads the arraylist class and prints its name.
+- Reflection is powerful but used carefully due to performance and security risks.

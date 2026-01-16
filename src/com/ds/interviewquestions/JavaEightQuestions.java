@@ -193,7 +193,6 @@ public class JavaEightQuestions {
         }
 
         // Count Age
-
         double v = employeeList.stream().mapToDouble(Employee::getAge).sum();
         System.out.println(v);
         // =====================  End  =============================

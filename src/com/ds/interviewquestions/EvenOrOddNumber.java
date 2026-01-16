@@ -15,7 +15,7 @@ public class EvenOrOddNumber {
     }
 
     public static void evenorOdd(int number){
-        int quo = number /2;
+        int quo = number/2;
         if(quo*2==number){
             System.out.println(number+" is E1");
         }else {
