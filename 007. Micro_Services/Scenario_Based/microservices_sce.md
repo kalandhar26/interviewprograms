@@ -214,9 +214,6 @@ public class UserService {
 - Spring Boot automatically uses Redis as the cache backend when configured.
 - Data is stored in a central Redis server, accessible by all microservice instances.
 - You can set a time-to-live (TTL) to automatically expire cached data.
-
-# 3. How do you implement Caching in your springboot application?
-
 - Caching in Java involves storing frequently accessed or expensive-to-fetch data (like DB results or API responses) in
   memory, so you can access it faster next time improving performance and reducing load.
 - Caching can be implemented using various data structures like HashMaps, LinkedHashMap or third-party libraries such as

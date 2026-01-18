@@ -2,28 +2,28 @@
 
 - **At-Most-Once:** A message is delivered zero or one time; it may be lost but never duplicated.
 - **How Kafka Achieves It:**
-  1. Producers send messages without waiting for broker acknowledgment (acks=0).
-  2. Consumers commit offsets immediately after receiving messages, before processing.
+    1. Producers send messages without waiting for broker acknowledgment (acks=0).
+    2. Consumers commit offsets immediately after receiving messages, before processing.
 - **Mechanism:** No retries on producer failure, and early offset commits on the consumer side risk message loss if
   processing fails.
 - **Use Case:** Suitable for scenarios where losing a message is acceptable (e.g., non-critical logs).
 
 - **At-Least-Once:** A message is delivered one or more times; it’s never lost but may be duplicated.
 - **How Kafka Achieves It:**
-  1. Producers wait for broker acknowledgment (acks=1 or acks=all) and retry on failure.
-  2. Consumers process messages first, then commit offsets, ensuring no message is missed.
-  3. If a consumer fails after processing but before committing, it may reprocess the message, leading to duplicates.
+    1. Producers wait for broker acknowledgment (acks=1 or acks=all) and retry on failure.
+    2. Consumers process messages first, then commit offsets, ensuring no message is missed.
+    3. If a consumer fails after processing but before committing, it may reprocess the message, leading to duplicates.
 - **Mechanism:** Producer retries and delayed offset commits ensure delivery but risk duplicates.
 - **Use Case:** Used when message loss is unacceptable (e.g., financial transactions).
 
 - **Exactly-Once:**A message is delivered exactly once—no loss, no duplicates.
 - **How Kafka Achieves It:**
 
-  1. Introduced in Kafka 0.11 with idempotent producers and transactional messaging.
-  2. Idempotent Producer: Assigns a unique Producer ID (PID) and sequence number to each message. Brokers detect and
-     eliminate duplicates based on PID and sequence.
-  3. Transactional Consumer: Uses transactions to ensure atomic writes across multiple partitions. Consumers read only
-     committed messages (isolation.level=read_committed).
+    1. Introduced in Kafka 0.11 with idempotent producers and transactional messaging.
+    2. Idempotent Producer: Assigns a unique Producer ID (PID) and sequence number to each message. Brokers detect and
+       eliminate duplicates based on PID and sequence.
+    3. Transactional Consumer: Uses transactions to ensure atomic writes across multiple partitions. Consumers read only
+       committed messages (isolation.level=read_committed).
 
 - **Mechanism:** Producers use enable.idempotence=true and transactional APIs (transactional.id). Consumers commit
   offsets transactionally, ensuring processing and offset commits are atomic.
@@ -74,7 +74,8 @@ spring:
 
 ### Solution
 
-Apache Kafka is a distributed streaming platform designed for high-throughput, fault-tolerant, and scalable processing of real-time data feeds, functioning as a publish-subscribe messaging system.
+Apache Kafka is a distributed streaming platform designed for high-throughput, fault-tolerant, and scalable processing
+of real-time data feeds, functioning as a publish-subscribe messaging system.
 
 - **Distributed System**: Kafka runs as a cluster of brokers, storing messages in a durable, replicated log.
 - **Publish-Subscribe**: Producers send messages to topics; consumers subscribe to read them.
@@ -82,15 +83,17 @@ Apache Kafka is a distributed streaming platform designed for high-throughput, f
 - **Durability**: Messages are persisted to disk and replicated across brokers.
 - **Scalability**: Scales by adding brokers or partitions to handle increased load.
 - **Workflow**:
-  - Producers publish messages to topics, stored in partitions with unique offsets.
-  - Consumers read messages, tracking progress via offsets.
-  - ZooKeeper or KRaft manages cluster coordination (e.g., leader election).
+    - Producers publish messages to topics, stored in partitions with unique offsets.
+    - Consumers read messages, tracking progress via offsets.
+    - ZooKeeper or KRaft manages cluster coordination (e.g., leader election).
 - **Use Cases**: Log aggregation, event streaming, real-time analytics.
 
 ```java
 // Simple Kafka Producer
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+
 import java.util.Properties;
 
 public class SimpleProducer {
@@ -113,19 +116,24 @@ public class SimpleProducer {
 
 Kafka’s architecture supports scalability and fault tolerance through distributed components.
 
-- **Brokers**: Servers storing topic partitions, handling read/write requests. One broker is the leader per partition; others are followers.
-- **ZooKeeper/KRaft**: ZooKeeper (pre-3.3) or KRaft (3.3+) manages metadata, leader election, and consumer group coordination.
+- **Brokers**: Servers storing topic partitions, handling read/write requests. One broker is the leader per partition;
+  others are followers.
+- **ZooKeeper/KRaft**: ZooKeeper (pre-3.3) or KRaft (3.3+) manages metadata, leader election, and consumer group
+  coordination.
 - **Topics**: Logical channels for messages, split into partitions.
 - **Partitions**: Ordered, immutable logs for scalability and parallelism, replicated across brokers.
 - **Consumers**: Read messages from topics, either standalone or in consumer groups for load balancing.
 - **Producers**: Send messages to topics, optionally specifying partitions or keys.
 - **Replication**: Each partition has a leader and follower replicas for fault tolerance.
-- **Workflow**: Producers write to leader partitions; consumers read from assigned partitions, with offsets tracked in `__consumer_offsets`.
+- **Workflow**: Producers write to leader partitions; consumers read from assigned partitions, with offsets tracked in
+  `__consumer_offsets`.
 
 ```java
 // Simple Kafka Consumer
+
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
@@ -157,23 +165,23 @@ public class SimpleConsumer {
 Kafka differs from traditional message queues like RabbitMQ in design and use cases.
 
 - **Architecture**:
-  - Kafka: Distributed log with persistent storage, partitioned topics for scalability.
-  - RabbitMQ: Queue-based system with messages typically removed after consumption.
+    - Kafka: Distributed log with persistent storage, partitioned topics for scalability.
+    - RabbitMQ: Queue-based system with messages typically removed after consumption.
 - **Message Retention**:
-  - Kafka: Retains messages for a configurable period (e.g., days), allowing replay.
-  - RabbitMQ: Messages are deleted after acknowledgment unless explicitly persisted.
+    - Kafka: Retains messages for a configurable period (e.g., days), allowing replay.
+    - RabbitMQ: Messages are deleted after acknowledgment unless explicitly persisted.
 - **Scalability**:
-  - Kafka: Scales horizontally via partitions and brokers, handling high throughput.
-  - RabbitMQ: Scales via clustering but is less suited for massive data volumes.
+    - Kafka: Scales horizontally via partitions and brokers, handling high throughput.
+    - RabbitMQ: Scales via clustering but is less suited for massive data volumes.
 - **Delivery Semantics**:
-  - Kafka: At-least-once by default, supports exactly-once with transactions.
-  - RabbitMQ: Supports at-most-once, at-least-once, or exactly-once with AMQP.
+    - Kafka: At-least-once by default, supports exactly-once with transactions.
+    - RabbitMQ: Supports at-most-once, at-least-once, or exactly-once with AMQP.
 - **Use Cases**:
-  - Kafka: Event streaming, log aggregation, real-time analytics.
-  - RabbitMQ: Task queues, point-to-point messaging, workflow orchestration.
+    - Kafka: Event streaming, log aggregation, real-time analytics.
+    - RabbitMQ: Task queues, point-to-point messaging, workflow orchestration.
 - **Consumer Model**:
-  - Kafka: Consumer groups for parallel processing.
-  - RabbitMQ: Work queues with competing consumers.
+    - Kafka: Consumer groups for parallel processing.
+    - RabbitMQ: Work queues with competing consumers.
 
 ## Question 4: How Does Kafka Ensure Message Delivery?
 
@@ -181,23 +189,33 @@ Kafka differs from traditional message queues like RabbitMQ in design and use ca
 
 Kafka ensures message delivery through replication, acknowledgments, and offset management.
 
-- **Replication**: Partitions are replicated across brokers (controlled by `replication.factor`), ensuring data availability if a broker fails.
+- **Replication**: Partitions are replicated across brokers (controlled by `replication.factor`), ensuring data
+  availability if a broker fails.
 - **Producer Acks**:
-  - `acks=0`: No acknowledgment; risk of loss.
-  - `acks=1`: Leader acknowledges; risk of loss if leader fails before replication.
-  - `acks=all`: All in-sync replicas acknowledge, ensuring durability.
+    - `acks=0`: No acknowledgment; risk of loss.
+    - `acks=1`: Leader acknowledges; risk of loss if leader fails before replication.
+    - `acks=all`: All in-sync replicas acknowledge, ensuring durability.
 - **Retries**: Producers retry failed sends (configurable via `retries`).
-- **Consumer Offset Commits**: Consumers commit offsets to track processed messages, resuming from the last offset on restart.
+- **Consumer Offset Commits**: Consumers commit offsets to track processed messages, resuming from the last offset on
+  restart.
 - **Idempotence**: Prevents duplicates by assigning unique sequence numbers to messages.
 - **Transactions**: Enable exactly-once delivery by coordinating writes and offset commits.
 
 ```java
 // Producer with Reliable Delivery
 Properties props = new Properties();
-props.put("bootstrap.servers", "localhost:9092");
-props.put("acks", "all");
-props.put("retries", 3);
-props.put("enable.idempotence", true);
+props.
+
+put("bootstrap.servers","localhost:9092");
+props.
+
+put("acks","all");
+props.
+
+put("retries",3);
+props.
+
+put("enable.idempotence",true);
 ```
 
 ## Question 5: What is the Role of `acks`, `retries`, and `linger.ms` in a Producer Config?
@@ -207,27 +225,39 @@ props.put("enable.idempotence", true);
 These configurations control producer reliability and performance.
 
 - **acks**:
-  - Specifies acknowledgment requirements.
-  - `acks=0`: No acknowledgment; fastest but risks loss.
-  - `acks=1`: Leader acknowledges; balances speed and reliability.
-  - `acks=all`: All in-sync replicas acknowledge; maximizes durability.
+    - Specifies acknowledgment requirements.
+    - `acks=0`: No acknowledgment; fastest but risks loss.
+    - `acks=1`: Leader acknowledges; balances speed and reliability.
+    - `acks=all`: All in-sync replicas acknowledge; maximizes durability.
 - **retries**:
-  - Number of retry attempts for transient failures (e.g., network issues).
-  - Set to a positive integer (e.g., 3) to handle temporary broker unavailability.
+    - Number of retry attempts for transient failures (e.g., network issues).
+    - Set to a positive integer (e.g., 3) to handle temporary broker unavailability.
 - **linger.ms**:
-  - Time (in milliseconds) the producer buffers messages before sending.
-  - Higher values increase latency but improve throughput by batching messages.
-  - Example: `linger.ms=5` waits 5ms to accumulate messages.
+    - Time (in milliseconds) the producer buffers messages before sending.
+    - Higher values increase latency but improve throughput by batching messages.
+    - Example: `linger.ms=5` waits 5ms to accumulate messages.
 
 ```java
 // Producer Config Example
 Properties props = new Properties();
-props.put("bootstrap.servers", "localhost:9092");
-props.put("acks", "all");
-props.put("retries", 3);
-props.put("linger.ms", 5);
-props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+props.
+
+put("bootstrap.servers","localhost:9092");
+props.
+
+put("acks","all");
+props.
+
+put("retries",3);
+props.
+
+put("linger.ms",5);
+props.
+
+put("key.serializer","org.apache.kafka.common.serialization.StringSerializer");
+props.
+
+put("value.serializer","org.apache.kafka.common.serialization.StringSerializer");
 ```
 
 ## Question 6: Explain Consumer Groups and Offset Management
@@ -237,18 +267,19 @@ props.put("value.serializer", "org.apache.kafka.common.serialization.StringSeria
 Consumer groups and offset management enable scalable and fault-tolerant message processing.
 
 - **Consumer Groups**:
-  - A group of consumers that share the same `group.id` to process a topic’s partitions in parallel.
-  - Kafka assigns each partition to exactly one consumer in the group.
-  - Rebalancing occurs when consumers join/leave, redistributing partitions.
+    - A group of consumers that share the same `group.id` to process a topic’s partitions in parallel.
+    - Kafka assigns each partition to exactly one consumer in the group.
+    - Rebalancing occurs when consumers join/leave, redistributing partitions.
 - **Offset Management**:
-  - Each message in a partition has a unique offset, tracking consumer progress.
-  - Offsets are stored in Kafka’s `__consumer_offsets` topic or committed manually.
-  - `enable.auto.commit=true`: Automatically commits offsets periodically.
-  - `enable.auto.commit=false`: Manual commits via `Acknowledgment.acknowledge()` for precise control.
+    - Each message in a partition has a unique offset, tracking consumer progress.
+    - Offsets are stored in Kafka’s `__consumer_offsets` topic or committed manually.
+    - `enable.auto.commit=true`: Automatically commits offsets periodically.
+    - `enable.auto.commit=false`: Manual commits via `Acknowledgment.acknowledge()` for precise control.
 - **Use Cases**: Load balancing, fault tolerance (e.g., resuming after crashes).
 
 ```java
 // Spring Kafka Consumer with Manual Offset Commit
+
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
@@ -270,18 +301,18 @@ public class KafkaConsumerService {
 Tuning Kafka for high throughput involves optimizing producer, consumer, and broker settings.
 
 - **Producer Tuning**:
-  - Increase `batch.size` (e.g., 16384) to send larger batches.
-  - Set `linger.ms` (e.g., 5) to batch messages before sending.
-  - Enable compressio an (`compression.type=gzip`) to reduce network load.
+    - Increase `batch.size` (e.g., 16384) to send larger batches.
+    - Set `linger.ms` (e.g., 5) to batch messages before sending.
+    - Enable compressio an (`compression.type=gzip`) to reduce network load.
 - **Consumer Tuning**:
-  - Increase `max.poll.records` (e.g., 500) to fetch more messages per poll.
-  - Set `fetch.min.bytes` (e.g., 1024) to wait for more data before polling.
+    - Increase `max.poll.records` (e.g., 500) to fetch more messages per poll.
+    - Set `fetch.min.bytes` (e.g., 1024) to wait for more data before polling.
 - **Broker Tuning**:
-  - Increase `num.io.threads` and `num.network.threads` for better I/O handling.
-  - Set `replication.factor=3` and `min.insync.replicas=2` for durability.
+    - Increase `num.io.threads` and `num.network.threads` for better I/O handling.
+    - Set `replication.factor=3` and `min.insync.replicas=2` for durability.
 - **Topic Configuration**:
-  - Increase partitions (e.g., 10) for parallelism.
-  - Optimize `segment.bytes` and `segment.ms` for efficient log management.
+    - Increase partitions (e.g., 10) for parallelism.
+    - Optimize `segment.bytes` and `segment.ms` for efficient log management.
 - **Infrastructure**: Use high-performance disks (e.g., SSDs) and sufficient brokers in AWS MSK or Kubernetes.
 
 ```yaml
@@ -306,18 +337,27 @@ Idempotence ensures that a producer does not create duplicate messages during re
 - **Definition**: Prevents duplicates by assigning unique sequence numbers to messages.
 - **Enablement**: Set `enable.idempotence=true` in producer config.
 - **Mechanism**:
-  - Producer assigns a `Producer ID` (PID) and sequence number to each message.
-  - Kafka brokers track sequence numbers to deduplicate messages.
-- **Benefits**: Guarantees at-least-once delivery without duplicates, enabling exactly-once semantics when combined with transactions.
+    - Producer assigns a `Producer ID` (PID) and sequence number to each message.
+    - Kafka brokers track sequence numbers to deduplicate messages.
+- **Benefits**: Guarantees at-least-once delivery without duplicates, enabling exactly-once semantics when combined with
+  transactions.
 - **Requirements**: `acks=all`, `retries>0`, and `max.in.flight.requests.per.connection=1` (default for idempotence).
 
 ```java
 // Idempotent Producer Config
 Properties props = new Properties();
-props.put("bootstrap.servers", "localhost:9092");
-props.put("enable.idempotence", true);
-props.put("acks", "all");
-props.put("retries", 3);
+props.
+
+put("bootstrap.servers","localhost:9092");
+props.
+
+put("enable.idempotence",true);
+props.
+
+put("acks","all");
+props.
+
+put("retries",3);
 ```
 
 ## Question 9: How Does Kafka Achieve Fault Tolerance?
@@ -327,8 +367,8 @@ props.put("retries", 3);
 Kafka ensures fault tolerance through replication and distributed architecture.
 
 - **Replication**:
-  - Each partition is replicated across multiple brokers (`replication.factor`).
-  - One broker is the leader; others are followers, syncing data.
+    - Each partition is replicated across multiple brokers (`replication.factor`).
+    - One broker is the leader; others are followers, syncing data.
 - **Leader Election**: If a leader fails, a follower is promoted via ZooKeeper/KRaft.
 - **In-Sync Replicas (ISR)**: Only ISRs can become leaders, ensuring data consistency.
 - **Broker Redundancy**: Multiple brokers in the cluster prevent single-point failures.
@@ -347,8 +387,10 @@ kafka-topics.sh --create --topic my-topic --bootstrap-server localhost:9092 --re
 A log aggregation pipeline collects logs from multiple sources, processes them, and stores or analyzes them.
 
 - **Producers**: Applications or agents (e.g., Fluentd, Logstash) send logs to a Kafka topic.
-- **Topic Design**: Use a topic (e.g., `logs`) with multiple partitions for scalability and a high `replication.factor` (e.g., 3).
-- **Consumers**: Spring Boot application consumes logs, processes them (e.g., parse, enrich), and stores them in a database (e.g., Elasticsearch on AWS).
+- **Topic Design**: Use a topic (e.g., `logs`) with multiple partitions for scalability and a high
+  `replication.factor` (e.g., 3).
+- **Consumers**: Spring Boot application consumes logs, processes them (e.g., parse, enrich), and stores them in a
+  database (e.g., Elasticsearch on AWS).
 - **Scaling**: Increase partitions and consumer instances to handle high log volumes.
 - **Monitoring**: Use Prometheus to track consumer lag and log ingestion rate.
 - **Durability**: Set `acks=all` and manual offset commits to prevent loss.
@@ -374,8 +416,9 @@ Kafka handles consumer crashes via consumer groups and offset management.
 
 - **Crash Impact**: The consumer group rebalances, reassigning the crashed consumer’s partitions to other instances.
 - **Offset Management**:
-  - If `enable.auto.commit=true`, offsets are periodically committed, and the new consumer resumes from the last committed offset.
-  - If `enable.auto.commit=false`, manual commits ensure no offsets are committed until processing completes.
+    - If `enable.auto.commit=true`, offsets are periodically committed, and the new consumer resumes from the last
+      committed offset.
+    - If `enable.auto.commit=false`, manual commits ensure no offsets are committed until processing completes.
 - **Resume Process**: The new consumer starts reading from the last committed offset in `__consumer_offsets`.
 - **Configuration**: Set `auto.offset.reset=earliest` to start from the beginning if no offsets exist.
 
@@ -415,12 +458,12 @@ spring:
 Monitoring Kafka ensures performance and reliability.
 
 - **Metrics**:
-  - Use JMX metrics (e.g., `kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec`).
-  - Monitor consumer lag (`kafka_consumergroup_lag`).
+    - Use JMX metrics (e.g., `kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec`).
+    - Monitor consumer lag (`kafka_consumergroup_lag`).
 - **Tools**:
-  - Prometheus + Grafana for visualizing metrics.
-  - AWS CloudWatch for MSK clusters.
-  - Kafka Manager or Confluent Control Center for cluster health.
+    - Prometheus + Grafana for visualizing metrics.
+    - AWS CloudWatch for MSK clusters.
+    - Kafka Manager or Confluent Control Center for cluster health.
 - **Logs**: Enable debug logging for `org.apache.kafka` and `org.springframework.kafka`.
 - **Alerts**: Set alerts for high consumer lag, broker failures, or low disk space.
 - **Key Metrics**: Message throughput, partition latency, broker CPU/disk usage.
@@ -430,7 +473,7 @@ Monitoring Kafka ensures performance and reliability.
 scrape_configs:
   - job_name: "kafka"
     static_configs:
-      - targets: ["kafka-broker:9999"]
+      - targets: [ "kafka-broker:9999" ]
 ```
 
 ## Question 14: How Would You Deploy Kafka in Kubernetes?
@@ -479,7 +522,7 @@ spec:
     - metadata:
         name: data
       spec:
-        accessModes: ["ReadWriteOnce"]
+        accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
             storage: 10Gi
@@ -492,11 +535,11 @@ spec:
 Retention policies control how long Kafka retains messages and logs.
 
 - **Retention Period**:
-  - `retention.ms`: Time messages are kept (e.g., 7 days = 604800000ms).
-  - `retention.bytes`: Maximum size per partition before old messages are deleted.
+    - `retention.ms`: Time messages are kept (e.g., 7 days = 604800000ms).
+    - `retention.bytes`: Maximum size per partition before old messages are deleted.
 - **Log Cleanup Policies**:
-  - `delete`: Removes old messages after retention period/size.
-  - `compact`: Removes duplicate keys, keeping the latest value (log compaction).
+    - `delete`: Removes old messages after retention period/size.
+    - `compact`: Removes duplicate keys, keeping the latest value (log compaction).
 - **Configuration**: Set at the topic level or broker-wide (`log.retention.hours`).
 - **Use Case**: Long retention for replayable logs; compaction for key-based data.
 
@@ -512,20 +555,22 @@ kafka-topics.sh --alter --topic my-topic --bootstrap-server localhost:9092 --con
 Kafka Streams is a lightweight stream processing library for building real-time applications.
 
 - **Kafka Streams**:
-  - Java library for processing Kafka topic data (e.g., filtering, aggregation).
-  - Integrates natively with Kafka, no external cluster needed.
-  - Supports stateful (e.g., joins) and stateless operations.
+    - Java library for processing Kafka topic data (e.g., filtering, aggregation).
+    - Integrates natively with Kafka, no external cluster needed.
+    - Supports stateful (e.g., joins) and stateless operations.
 - **Use Cases**: Real-time event processing, data transformation, microservices.
 - **Kafka Streams vs. Spark**:
-  - Kafka Streams: Lightweight, low-latency, tightly integrated with Kafka, ideal for simple stream processing in Spring Boot.
-  - Spark: Heavyweight, supports batch and stream processing, better for complex analytics or large-scale data.
+    - Kafka Streams: Lightweight, low-latency, tightly integrated with Kafka, ideal for simple stream processing in
+      Spring Boot.
+    - Spark: Heavyweight, supports batch and stream processing, better for complex analytics or large-scale data.
 - **Choose Kafka Streams**:
-  - When processing is Kafka-centric and lightweight.
-  - For low-latency, real-time applications.
-  - When avoiding external cluster management (e.g., Spark cluster).
+    - When processing is Kafka-centric and lightweight.
+    - For low-latency, real-time applications.
+    - When avoiding external cluster management (e.g., Spark cluster).
 
 ```java
 // Kafka Streams Example
+
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
@@ -539,7 +584,7 @@ public class StreamsExample {
         StreamsBuilder builder = new StreamsBuilder();
         KStream<String, String> stream = builder.stream("input-topic");
         stream.filter((key, value) -> value.contains("important"))
-              .to("output-topic");
+                .to("output-topic");
 
         KafkaStreams streams = new KafkaStreams(builder.build(), props);
         streams.start();
@@ -554,11 +599,11 @@ public class StreamsExample {
 Kafka supports message reprocessing by allowing consumers to rewind offsets.
 
 - **Offset Rewind**:
-  - Consumers can reset offsets to an earlier point using `seek` or `auto.offset.reset=earliest`.
-  - Useful for reprocessing historical data or recovering from errors.
+    - Consumers can reset offsets to an earlier point using `seek` or `auto.offset.reset=earliest`.
+    - Useful for reprocessing historical data or recovering from errors.
 - **Consumer Group Reset**:
-  - Use `kafka-consumer-groups.sh --reset-offsets` to reset offsets for a group.
-  - Options: `--to-earliest`, `--to-offset`, `--to-datetime`.
+    - Use `kafka-consumer-groups.sh --reset-offsets` to reset offsets for a group.
+    - Options: `--to-earliest`, `--to-offset`, `--to-datetime`.
 - **Retention Period**: Messages must be within the topic’s retention period (`retention.ms`).
 - **Log Compaction**: For compacted topics, only the latest message per key is available for reprocessing.
 
@@ -574,25 +619,40 @@ kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group my-consumer-g
 Exactly-once semantics (EOS) ensures each message is processed exactly once, avoiding duplicates or loss.
 
 - **Mechanism**:
-  - Enabled via idempotent producers (`enable.idempotence=true`) to prevent duplicates.
-  - Uses transactions to coordinate message production and offset commits atomically.
+    - Enabled via idempotent producers (`enable.idempotence=true`) to prevent duplicates.
+    - Uses transactions to coordinate message production and offset commits atomically.
 - **Producer**: Assigns unique sequence numbers and uses `transactional.id` for atomic writes.
 - **Consumer**: Sets `isolation.level=read_committed` to read only committed messages.
 - **Use Case**: Critical applications requiring no duplicates (e.g., financial transactions).
 - **Spring Boot Example**:
-  - Configure `transactional.id` and manual offset commits.
+    - Configure `transactional.id` and manual offset commits.
 
 ```java
 // Transactional Producer
 Properties props = new Properties();
-props.put("bootstrap.servers", "localhost:9092");
-props.put("transactional.id", "tx-producer");
-props.put("enable.idempotence", true);
+props.
+
+put("bootstrap.servers","localhost:9092");
+props.
+
+put("transactional.id","tx-producer");
+props.
+
+put("enable.idempotence",true);
+
 KafkaProducer<String, String> producer = new KafkaProducer<>(props);
-producer.initTransactions();
-producer.beginTransaction();
-producer.send(new ProducerRecord<>("my-topic", "key", "value"));
-producer.commitTransaction();
+producer.
+
+initTransactions();
+producer.
+
+beginTransaction();
+producer.
+
+send(new ProducerRecord<>("my-topic", "key","value"));
+        producer.
+
+commitTransaction();
 ```
 
 ## Question 19: How Do You Secure Kafka in a Spring Boot Application?
@@ -602,15 +662,15 @@ producer.commitTransaction();
 Securing Kafka involves encryption, authentication, and authorization.
 
 - **SSL/TLS**:
-  - Enable `security.protocol=SSL` for encrypted communication.
-  - Configure truststore and keystore for brokers and clients.
+    - Enable `security.protocol=SSL` for encrypted communication.
+    - Configure truststore and keystore for brokers and clients.
 - **Authentication**:
-  - Use SASL (e.g., SASL/SCRAM, SASL/PLAIN) or IAM with AWS MSK.
-  - Example: `sasl.mechanism=SCRAM-SHA-512`.
+    - Use SASL (e.g., SASL/SCRAM, SASL/PLAIN) or IAM with AWS MSK.
+    - Example: `sasl.mechanism=SCRAM-SHA-512`.
 - **Authorization**:
-  - Enable ACLs to restrict topic access (`authorizer.class.name=kafka.security.authorizer.AclAuthorizer`).
+    - Enable ACLs to restrict topic access (`authorizer.class.name=kafka.security.authorizer.AclAuthorizer`).
 - **Spring Boot Config**:
-  - Set SSL and SASL properties in `application.yml`.
+    - Set SSL and SASL properties in `application.yml`.
 - **Key Management**: Store certificates and credentials in AWS Secrets Manager or Kubernetes secrets.
 
 ```yaml
@@ -631,11 +691,11 @@ Schema evolution ensures compatibility when message formats change.
 
 - **Schema Registry**: Use Confluent Schema Registry to manage Avro, JSON, or Protobuf schemas.
 - **Compatibility Types**:
-  - Backward: New consumers can read old messages.
-  - Forward: Old consumers can read new messages.
-  - Full: Both backward and forward compatible.
+    - Backward: New consumers can read old messages.
+    - Forward: Old consumers can read new messages.
+    - Full: Both backward and forward compatible.
 - **Spring Boot Integration**:
-  - Use `spring-kafka` with `avro-serde` for schema-aware serialization.
+    - Use `spring-kafka` with `avro-serde` for schema-aware serialization.
 - **Best Practices**: Version schemas, test compatibility, and update consumers/producers incrementally.
 
 ```java
@@ -655,12 +715,13 @@ public ProducerFactory<String, MyAvroRecord> producerFactory() {
 DLTs store messages that fail processing for later analysis.
 
 - **Configuration**:
-  - Define a DLT topic (e.g., `my-topic-dlt`).
-  - Use `DeadLetterPublishingRecoverer` to route failed messages.
+    - Define a DLT topic (e.g., `my-topic-dlt`).
+    - Use `DeadLetterPublishingRecoverer` to route failed messages.
 - **Error Handling**: Catch exceptions in `@KafkaListener` and publish to DLT.
 - **Monitoring**: Monitor DLT for failed messages and process them manually or automatically.
 
 ```java
+
 @Bean
 public DeadLetterPublishingRecoverer deadLetterPublishingRecoverer(KafkaTemplate<String, String> template) {
     return new DeadLetterPublishingRecoverer(template);
@@ -687,8 +748,8 @@ Optimizing Kafka in AWS MSK enhances throughput and reliability.
 - **Multi-AZ Deployment**: Deploy across multiple availability zones for fault tolerance.
 - **Monitoring**: Use CloudWatch for metrics (e.g., `BytesInPerSec`, `ConsumerLag`).
 - **Tuning**:
-  - Set `num.io.threads=8` and `num.network.threads=5` for brokers.
-  - Use `compression.type=snappy` for producers.
+    - Set `num.io.threads=8` and `num.network.threads=5` for brokers.
+    - Use `compression.type=snappy` for producers.
 - **IAM Authentication**: Enable IAM for secure access without managing credentials.
 
 ```yaml
@@ -704,24 +765,44 @@ spring:
 ## Question 23: If There are 2 consumer groups which consume from same topic. Will the message is polled twice? or this is not possible?
 
 - Kafka keeps one offset per (partition, consumer-group).
-- Both groups read the same physical records independently; nothing prevents the broker from sending the same message to both.
+- Both groups read the same physical records independently; nothing prevents the broker from sending the same message to
+  both.
 - Each consumer group maintains its own independent offset for every partition of a topic.
 - The broker does not block one group just because another group is already reading that partition.
-  Only within the same consumer group is a partition assigned to exactly one consumer at a time; across different groups, simultaneous access is allowed.
+  Only within the same consumer group is a partition assigned to exactly one consumer at a time; across different
+  groups, simultaneous access is allowed.
 
 ## Question 24: What are the key properties of Kafka Producer?
 
 ```java
 Properties props = new Properties();
-props.put("bootstrap.servers", "broker1:9092,broker2:9092");
-props.put("acks", "all");
-props.put("retries", 3);
-props.put("batch.size", 16384);
-props.put("linger.ms", 20);
-props.put("buffer.memory", 33554432);
-props.put("compression.type", "snappy");
-props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+props.
+
+put("bootstrap.servers","broker1:9092,broker2:9092");
+props.
+
+put("acks","all");
+props.
+
+put("retries",3);
+props.
+
+put("batch.size",16384);
+props.
+
+put("linger.ms",20);
+props.
+
+put("buffer.memory",33554432);
+props.
+
+put("compression.type","snappy");
+props.
+
+put("key.serializer","org.apache.kafka.common.serialization.StringSerializer");
+props.
+
+put("value.serializer","org.apache.kafka.common.serialization.StringSerializer");
 
 KafkaProducer<String, String> producer = new KafkaProducer<>(props);
 ```
@@ -767,24 +848,49 @@ KafkaProducer<String, String> producer = new KafkaProducer<>(props);
 
 ```java
 Properties props = new Properties();
-props.put("bootstrap.servers", "broker1:9092,broker2:9092");
-props.put("group.id", "order-processing-group");
-props.put("auto.offset.reset", "earliest");
-props.put("enable.auto.commit", "false");
-props.put("max.poll.records", "100");
-props.put("session.timeout.ms", "30000");
-props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+props.
+
+put("bootstrap.servers","broker1:9092,broker2:9092");
+props.
+
+put("group.id","order-processing-group");
+props.
+
+put("auto.offset.reset","earliest");
+props.
+
+put("enable.auto.commit","false");
+props.
+
+put("max.poll.records","100");
+props.
+
+put("session.timeout.ms","30000");
+props.
+
+put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
+props.
+
+put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
 
 KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
-consumer.subscribe(Collections.singletonList("orders"));
+consumer.
 
-while (true) {
-    ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-    for (ConsumerRecord<String, String> record : records) {
-        System.out.printf("Received: key=%s, value=%s%n", record.key(), record.value());
-    }
-    consumer.commitSync(); // Manual offset commit
+subscribe(Collections.singletonList("orders"));
+
+        while(true){
+ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+    for(
+ConsumerRecord<String, String> record :records){
+        System.out.
+
+printf("Received: key=%s, value=%s%n",record.key(),record.
+
+value());
+        }
+        consumer.
+
+commitSync(); // Manual offset commit
 }
 ```
 
@@ -824,3 +930,115 @@ while (true) {
   | High Throughput | `fetch.min.bytes=1MB`, `max.poll.records=500` |
   | Low Latency | `fetch.min.bytes=1`, `max.poll.records=1` |
   | Avoid Rebalance Issues | `session.timeout.ms=30s`, `max.poll.interval.ms=5m` |
+
+=========================================================================================
+
+# How does kafka handle message size limits?
+
+- Kafka has configurable message size limits. The default maximum message size is 1MB, but this can be increased by
+  changing the 'message.max.bytes' configuration on the broker and the 'max.request.size' on the producer. However ,
+  very large messages can impact performance and memory usage. So its generally recommended to keep messages relativey
+  small.
+
+# What is the purpose of idempotent producer in kafka?
+
+- The idempotent producer in kafka ensures that messages are delivered exactly once to a partition, even in case of
+  retries. It achieves this by assigning a unique ID to each producer request and maintaining a sequence number for
+  each producer-partition pair. This prevents duplicate messages due to network issues or producer issues.
+
+# How does Kafka support scalability?
+
+- Kafka supports scalability through partitioning and distributed processing. Topics can be partitioned across multiple
+  brokers, allowing for parallel processing.
+- Consumers can be grouped to read from multiple partitions simultaneously.
+- Brokers can be added to cluster to increase capacity and the cluster can be scaled without downtime.
+
+# How does kafka handle message delivery timeouts?
+
+- Kafka producers can be configured with delivery timeouts . If a message cannot be successfully acknowledged with in
+  this timeout period, the producer will consider the send failed and may retry (depending on configuration).
+- On the consumer side, there is a max.poll.interval.ms setting that controls how long a consumer can go without polling
+  before it is considered failed and a rebalance is triggered.
+
+# How does kafka ensures fault tolerance?
+
+- Kafka ensures fault tolerance through data replication. Each partition is replicated across a configurable number of
+  servers for fault tolerance.
+- One of the servers is designated as the leader, which handles all read and write requests for the partition, while the
+  others are followers that passively replicate the leader.
+- If the leader goes down, one of the followers can become leader and perform same operations.
+
+# How does kafka handle message delivery semantics?
+
+- Kafka supports three message delivery semantics
+- At most once : Messages may be lost but are never redelivered.
+- At least once : Messages are never lost but may be redelivered.
+- Exactly once: Each message is delivered once and only once. The choice depends on the specific use case and can be
+  configured through producer and consumer settings.
+
+# How does kafka handle message deletion?
+
+- Kafka does not delete messages individually. Instead, it uses a retention policy to manage message deletion.
+- Messages are retained either for configurable amount of time or until the topic reaches a certain size.
+- Once the retention limit is reached, Kafka deletes messages in bulk by removing whole segments of the log file.
+- For more fine-grained control, Kafka also supports log compaction.
+
+# What is the role of group co-ordinator in kafka?
+
+- The group coordinator in kafka is responsible for managing consumer groups.
+- It handles consumer group membership, assigns partitions to consumers within a group and manages offset commits.
+- When a consumer joins or leaves a group, the group co-ordinator triggers a rebalance to reassign partitions among the
+  remaining consumers.
+- As part of Kafka 4 , Rebalance logic is enhanced? Please define what is it?
+
+# How does kafka handle back pressure and slow consumers?
+
+- Kafka uses consumer offsets; each consumer reads at its own pace.
+- decouples producers and consumers.
+- Messages can stay in kafka for the retention period, allowing slow consumers to catch up.
+- However, if consumers fall too fat behind, data might expire before its consumed.
+
+# How does kafka ensure message durability?
+
+- Kafka ensures durability through
+- *Disk Persistence*: Messages are written to disk as soon as they arrive.
+- *Replication*: Topics have configurable replication factors. Data is replicated across brokers.
+- *Acknowledgements*: 'acks = all' ensures a message is considered committed only when all replicas acknowledge it.
+- *Write-ahead Log*: Kafka uses a commit log structure to store data.
+
+# How do you understand about kafka  MirrorMaker?
+
+- The MirrorMaker is a standalone utility for copying data from one apache cluster to another.
+- The MirrorMaker reads data from original cluster topics and writes it to a destination cluster with the same topic
+  name.
+- The source and destination clusters are separate entities that can have various partition counts and offset values.
+
+# How does kafka handle message ordering?
+
+- Kafka guarantees order with in a partition.
+- Messages sent by a producer to a particular topic partition will be appended in a the order they are sent.
+- A Consumer instance will read records in the order they are stored in the log. However, there is no guarantee of the
+  order across partitions.
+
+# How does kafka handle data retention?
+
+- Kafka handles data retention through configurable retention policies.
+- These can be based on time (retain data for 7 days or size (retain upto 1GB per partition)).
+- After the retention limit is reached, old messages are discarded.
+- Kafka also supports log compaction for topics where only the latest value for each key is needed.
+
+# How does kafka handle consumer offsets?
+
+- Kafka maintains offsets for each consumer group per partition. These offsets represent the position of the consumer in
+  the partition log.
+- Consumers can commit these offsets either automatically (at configurable intervals) or manually.
+- Kafka stores these offsets in a special kafka topic called `_consumer_offsets`, allowing consumers to resume from
+  where they left off in case of restarts or failures.
+
+# What is the role of the controller in a kafka cluster?
+
+- The controller in a kafka cluster is a broker that has additional responsibilities for managing the overall state of
+  cluster.
+- It is responsible for electing partition leaders and managing the distribution of partitions across brokers, and
+  handling administrative operations like adding or removing topics.
+- If the controller fails, ZooKeeper helps elect a new controller among the brokers.
