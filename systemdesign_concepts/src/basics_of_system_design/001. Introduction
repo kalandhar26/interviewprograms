@@ -1,0 +1,123 @@
+# System Design Introduction
+
+- Requirement Analysis.
+    - Functional requirements that describe specific features and functionalities
+    - Non Functional requirements  that specify qualities and attributes (performance and reliability)
+- Resource Estimation (Back of the envelope estimation.)
+    - After grasping the requirements, the next step involves estimating the necessary resources inclucing the no of
+    servers, storage capacity and network bandwidth
+    required to fulfill both functional and non-functional requirements.
+- Design Elements Selection
+    - Common design elements such as load balancers(LB), content delivery networks(CDN), domain name systems(DNS),
+    distributed caches and messaging systems offer pre-designed solutions to typical challenges in distributed system design.
+    - Incorporating these elements streamlines the design process and avoids reinventing the wheel.
+- Abstract High Level Design.
+    - In this step we develop an abstract high level design that identifies various system components while adhering to
+    single responsibility principle. This step provides an overview of the system architecture and helps in understanding
+    the interactions between different components.
+- API Design:
+    - We need to define various API's and their communication protocols to ensure seamless interaction between different
+    parts of the system, aligning with both functional and non-functional requirements. We determine the necessary web
+    communication and data fetch patterns to facilitate interactions between system components.
+- Data Modeling.
+    - Data modeling may not always a focal point in system design interviews, its essential to understand its principles
+    and techniques.
+- Design Evaluation.
+    - In the final step, we evaluate a design to ensure it meets all agreed-upon requirements.
+
+
+## Fundamentals
+
+- To create efficient design, its crucial to grasp fundamental distributed system concepts.
+- Scalability.
+- Availability
+- Reliability
+- Software Performance
+- Performance Metrics
+- FaultTolerance
+- Maintainability
+
+## Design trade-offs
+- System design often involves making trade-offs between different factors such as performance, cost, complexity and ease of maintenance.
+- Optimizing one aspect of a system may come at the expense of others.
+- we need to master the art of articulating system design trade-offs and hone our decision making abilities.
+- Some of the trade-offs worth exploring are listed below
+- Strong vs Eventual Consistency.
+Strong consistency ensures data is always up-to-date but may slow things down. Eventual consistency is faster but might show slightly outdated data.
+    - Example: A bank app (strong consistency) ensures your balance is always accurate, while a social media feed (eventual consistency) might show a post a few seconds late.
+- Balancing latency against Throughput. Low latency means faster responses, but high throughput means handling more requests.
+    - Example: A gaming app like Fortnite prioritizes low latency for real-time play, while a data analytics tool prioritizes
+        throughput to process large datasets.
+- Weighing Batch Processing against Stream Processing.
+- Evaluating load balancer versus API Gateway.
+- Comparing Proxy with Reverse Proxy.
+- Deciding between SQL and NoSQL databases.
+    - SQL databases are structured and great for complex queries, while NoSQL databases are flexible and scale easily.
+      Example: A payroll system might use SQL for structured employee data, while a recommendation engine like Netflix’s
+      might use NoSQL for flexible user data.
+- Choosing between REST and GRpc vs GraphQL for communication protocols.
+- Exploring polling, Long polling and webhooks for real-time updates.
+- Assessing serverless architecture versus traditional server-based setups.
+- differentiating stateful from stateless architecture paradigms.
+
+## Back of the envelope calculations
+
+- Back of the envelope calculations refer to quick, rough estimates or calculations done using simplified assumptions.
+- They help us think critically about scalability, performance and resource requirements.
+Ex: Concurrent TCP connections, Requests per Second , Storage and Network Bandwidth.
+- We need to ensure that scale assumptions made during back of envelope calculations are reasonable and not overly
+exaggerated.
+- For a Twitter-like app, calculate how many tweets (280 characters each) can be stored in 1TB of storage or
+how many servers are needed to handle 10,000 tweets per second.
+
+## Building Block:
+
+- Load Balancers.  Spreads traffic across servers. Used by eBay to handle millions of auction bids.
+- API Gateway. Manages and routes API requests. Spotify uses an API gateway to handle requests from its mobile app to its music catalog.
+- Databases
+- Content Delivery Network
+- Distributed Caching
+- Distributed Messaging Queue. Manages tasks like sending emails or processing orders. Amazon uses queues to process orders in the background.
+- Publish-Subscribe System
+- Blob Store. Stores large files like images or videos. Google Photos uses blob storage for user-uploaded images.
+- Domain Name System
+
+## Common Design Elements
+- Unique ID Generator. Creates unique IDs for data entries. Twitter uses id generator to assign unique IDs to every tweet.
+- Service Monitoring.
+- Rate Limiter. Prevents system overload by limiting requests. Reddit uses rate limiters to stop bots from spamming.
+- Distributed Search
+- Distributed Logging.
+- Distributed Task Scheduling. Schedules tasks across servers. Airbnb schedules property updates across its platform.
+- Sharded Counters.
+
+## API Design
+- APIs need clear protocols and secure communication.
+- Network Protocols
+- Client-Server Communication.
+- API architecture Styles.
+- Http based web and data communication.
+- Security
+
+## Data Modeling
+- Data modelling is designing the database schema and data storage mechanisms for the system.
+- This includes database schema design, data partitioning, indexing, caching and data consistency mechanisms.
+- This involves designing how data is stored and accessed.
+  - Example: For a review platform like Yelp, data modeling includes storing restaurant details, user reviews, and ratings,
+   with indexes to quickly search by location or category.
+
+## Commonly asked system design principles
+
+- Youtube
+- Quora
+- Google Maps
+- URL Shortening Service
+- Uber
+- Twitter
+- Yelp
+- Whatsapp
+- Telegram
+- web Crawler
+- TypeAhead Suggestion.
+- RazorPay
+
