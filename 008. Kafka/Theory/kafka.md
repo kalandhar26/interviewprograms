@@ -35,7 +35,7 @@
 - at-least-once with retries and delayed commits.
 - exactly-once using idempotent producers and transactional APIs to prevent loss and duplicates.
 
-# How do you test Kakfa consumers in a real time scenario?
+# How do you test Kafka consumers in a real time scenario?
 
 - Embedded Kafka (for unit/integration tests):
 
@@ -202,20 +202,72 @@ Kafka ensures message delivery through replication, acknowledgments, and offset 
 - **Transactions**: Enable exactly-once delivery by coordinating writes and offset commits.
 
 ```java
-// Producer with Reliable Delivery
-Properties props = new Properties();
-props.
+package com.example.kafka.producer;
 
-put("bootstrap.servers","localhost:9092");
-props.
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 
-put("acks","all");
-props.
+import java.util.Properties;
 
-put("retries",3);
-props.
+public class ReliableKafkaProducer {
 
-put("enable.idempotence",true);
+    public static void main(String[] args) {
+
+        // 1. Producer Configuration for Reliable Delivery
+        Properties props = new Properties();
+
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                "localhost:9092");
+
+        props.put(ProducerConfig.ACKS_CONFIG,
+                "all");                         // Strong durability
+
+        props.put(ProducerConfig.RETRIES_CONFIG,
+                3);                             // Retry on transient failures
+
+        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG,
+                true);                          // Prevent duplicates
+
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringSerializer");
+
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringSerializer");
+
+        // 2. Create Kafka Producer
+        KafkaProducer<String, String> producer =
+                new KafkaProducer<>(props);
+
+        try {
+            // 3. Create and send message
+            ProducerRecord<String, String> record =
+                    new ProducerRecord<>("orders",
+                            "order-101",
+                            "Order Placed Successfully");
+
+            producer.send(record, (RecordMetadata metadata, Exception exception) -> {
+                if (exception == null) {
+                    System.out.printf(
+                            "Message delivered to topic=%s partition=%d offset=%d%n",
+                            metadata.topic(),
+                            metadata.partition(),
+                            metadata.offset()
+                    );
+                } else {
+                    exception.printStackTrace();
+                }
+            });
+
+        } finally {
+            // 4. Flush and close producer
+            producer.flush();
+            producer.close();
+        }
+    }
+}
+                         
 ```
 
 ## Question 5: What is the Role of `acks`, `retries`, and `linger.ms` in a Producer Config?
@@ -238,26 +290,72 @@ These configurations control producer reliability and performance.
     - Example: `linger.ms=5` waits 5ms to accumulate messages.
 
 ```java
-// Producer Config Example
-Properties props = new Properties();
-props.
+package com.example.kafka.producer;
 
-put("bootstrap.servers","localhost:9092");
-props.
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 
-put("acks","all");
-props.
+import java.util.Properties;
 
-put("retries",3);
-props.
+public class ProducerConfiguration {
 
-put("linger.ms",5);
-props.
+    public static void main(String[] args) {
 
-put("key.serializer","org.apache.kafka.common.serialization.StringSerializer");
-props.
+        // 1. Producer Configuration
+        Properties props = new Properties();
 
-put("value.serializer","org.apache.kafka.common.serialization.StringSerializer");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                "localhost:9092");
+
+        props.put(ProducerConfig.ACKS_CONFIG,
+                "all");                 // Strong durability
+
+        props.put(ProducerConfig.RETRIES_CONFIG,
+                3);                     // Retry on transient failures
+
+        props.put(ProducerConfig.LINGER_MS_CONFIG,
+                5);                     // Enable batching
+
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringSerializer");
+
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringSerializer");
+
+        // 2. Create Kafka Producer
+        KafkaProducer<String, String> producer =
+                new KafkaProducer<>(props);
+
+        try {
+            // 3. Send a sample message
+            ProducerRecord<String, String> record =
+                    new ProducerRecord<>("orders",
+                            "order-1",
+                            "Order Created");
+
+            producer.send(record, (RecordMetadata metadata, Exception exception) -> {
+                if (exception == null) {
+                    System.out.printf(
+                            "Message sent successfully to topic=%s, partition=%d, offset=%d%n",
+                            metadata.topic(),
+                            metadata.partition(),
+                            metadata.offset()
+                    );
+                } else {
+                    exception.printStackTrace();
+                }
+            });
+
+        } finally {
+            // 4. Flush and close producer
+            producer.flush();
+            producer.close();
+        }
+    }
+}
+
 ```
 
 ## Question 6: Explain Consumer Groups and Offset Management
@@ -344,20 +442,34 @@ Idempotence ensures that a producer does not create duplicate messages during re
 - **Requirements**: `acks=all`, `retries>0`, and `max.in.flight.requests.per.connection=1` (default for idempotence).
 
 ```java
-// Idempotent Producer Config
-Properties props = new Properties();
-props.
+import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.common.serialization.StringSerializer;
 
-put("bootstrap.servers","localhost:9092");
-props.
+import java.util.Properties;
 
-put("enable.idempotence",true);
-props.
+public class IdempotentProducer {
 
-put("acks","all");
-props.
+    public static void main(String[] args) {
 
-put("retries",3);
+        Properties props = new Properties();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+
+        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
+        props.put(ProducerConfig.RETRIES_CONFIG, 3);
+
+        KafkaProducer<String, String> producer = new KafkaProducer<>(props);
+
+        try {
+            producer.send(new ProducerRecord<>("orders", "key1", "order-created"));
+        } finally {
+            producer.close();
+        }
+    }
+}
+
 ```
 
 ## Question 9: How Does Kafka Achieve Fault Tolerance?
@@ -628,31 +740,44 @@ Exactly-once semantics (EOS) ensures each message is processed exactly once, avo
     - Configure `transactional.id` and manual offset commits.
 
 ```java
-// Transactional Producer
-Properties props = new Properties();
-props.
+import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.common.serialization.StringSerializer;
 
-put("bootstrap.servers","localhost:9092");
-props.
+import java.util.Properties;
 
-put("transactional.id","tx-producer");
-props.
+public class ExactlyOnceProducer {
 
-put("enable.idempotence",true);
+    public static void main(String[] args) {
 
-KafkaProducer<String, String> producer = new KafkaProducer<>(props);
-producer.
+        Properties props = new Properties();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
-initTransactions();
-producer.
+        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
+        props.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE);
 
-beginTransaction();
-producer.
+        props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "tx-producer-1");
 
-send(new ProducerRecord<>("my-topic", "key","value"));
-        producer.
+        KafkaProducer<String, String> producer = new KafkaProducer<>(props);
 
-commitTransaction();
+        producer.initTransactions();
+
+        try {
+            producer.beginTransaction();
+
+            producer.send(new ProducerRecord<>("my-topic", "key", "value"));
+
+            producer.commitTransaction();
+        } catch (Exception e) {
+            producer.abortTransaction();
+        } finally {
+            producer.close();
+        }
+    }
+}
+
 ```
 
 ## Question 19: How Do You Secure Kafka in a Spring Boot Application?
@@ -775,42 +900,90 @@ spring:
 ## Question 24: What are the key properties of Kafka Producer?
 
 ```java
-Properties props = new Properties();
-props.
+package com.example.kafka.producer;
 
-put("bootstrap.servers","broker1:9092,broker2:9092");
-props.
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.RecordMetadata;
 
-put("acks","all");
-props.
+import java.util.Properties;
 
-put("retries",3);
-props.
+public class OrderProducer {
 
-put("batch.size",16384);
-props.
+    public static void main(String[] args) {
 
-put("linger.ms",20);
-props.
+        // 1. Producer configuration
+        Properties props = new Properties();
 
-put("buffer.memory",33554432);
-props.
+        // Initial list of Kafka brokers used to discover the cluster, Producer automatically finds the leader for each partition
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                "broker1:9092,broker2:9092");
 
-put("compression.type","snappy");
-props.
+        props.put(ProducerConfig.ACKS_CONFIG,
+                "all");
 
-put("key.serializer","org.apache.kafka.common.serialization.StringSerializer");
-props.
+        props.put(ProducerConfig.RETRIES_CONFIG,
+                3);
 
-put("value.serializer","org.apache.kafka.common.serialization.StringSerializer");
+        props.put(ProducerConfig.BATCH_SIZE_CONFIG,
+                16384);
 
-KafkaProducer<String, String> producer = new KafkaProducer<>(props);
+        props.put(ProducerConfig.LINGER_MS_CONFIG,
+                20);
+
+        props.put(ProducerConfig.BUFFER_MEMORY_CONFIG,
+                33554432);
+
+        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG,
+                "snappy");
+
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringSerializer");
+
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringSerializer");
+
+        // 2. Create Kafka Producer
+        KafkaProducer<String, String> producer = new KafkaProducer<>(props);
+
+        try {
+            // 3. Send messages
+            for (int i = 1; i <= 5; i++) {
+
+                ProducerRecord<String, String> record =
+                        new ProducerRecord<>("orders",
+                                "order-" + i,
+                                "Order Created : " + i);
+
+                producer.send(record, (RecordMetadata metadata, Exception exception) -> {
+                    if (exception == null) {
+                        System.out.printf(
+                                "Sent to topic=%s partition=%d offset=%d%n",
+                                metadata.topic(),
+                                metadata.partition(),
+                                metadata.offset()
+                        );
+                    } else {
+                        exception.printStackTrace();
+                    }
+                });
+            }
+        } finally {
+            // 4. Flush & close producer
+            producer.flush();
+            producer.close();
+        }
+    }
+}
+
 ```
 
-- **acks:** Controls when the producer considers a message "sent" successfully.
+- **acks:** Controls when the producer considers a message "sent" successfully. Controls durability guarantee
 - acks=0 : No acknowledgment. Fire-and-forget. where some data loss is acceptable.
 - acks=1 : Leader acknowledges receipt. Good for most apps where some durability is needed.
-- acks=all : Leader + all ISRs (in-sync replicas) acknowledge.where no loss is acceptable.
+- acks=all : Leader + all ISRs (in-sync replicas) acknowledge.where no loss is acceptable. all → Leader waits for all
+  in-sync replicas to acknowledge
 - **retries & retry.backoff.ms** Handles transient failures, broker down, network issues
 - retries: Number of retries (default: 0). Set to Integer.MAX_VALUE for mission-critical apps.
 - retry.backoff.ms: Delay between retries (default: 100ms). Adjust based on broker recovery time.
@@ -847,51 +1020,83 @@ KafkaProducer<String, String> producer = new KafkaProducer<>(props);
 ## Question 25: What are the key properties of Kafka Consumer?
 
 ```java
-Properties props = new Properties();
-props.
+package com.example.kafka.consumer;
 
-put("bootstrap.servers","broker1:9092,broker2:9092");
-props.
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 
-put("group.id","order-processing-group");
-props.
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Properties;
 
-put("auto.offset.reset","earliest");
-props.
+public class OrderConsumer {
 
-put("enable.auto.commit","false");
-props.
+    public static void main(String[] args) {
 
-put("max.poll.records","100");
-props.
+        // 1. Kafka Consumer Configuration
+        Properties props = new Properties();
 
-put("session.timeout.ms","30000");
-props.
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                "broker1:9092,broker2:9092");
 
-put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
-props.
+        props.put(ConsumerConfig.GROUP_ID_CONFIG,
+                "order-processing-group");
 
-put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
+                "earliest");
 
-KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
-consumer.
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,
+                "false"); // Manual offset commit
 
-subscribe(Collections.singletonList("orders"));
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG,
+                "100");
 
-        while(true){
-ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-    for(
-ConsumerRecord<String, String> record :records){
-        System.out.
+        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG,
+                "30000");
 
-printf("Received: key=%s, value=%s%n",record.key(),record.
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringDeserializer");
 
-value());
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringDeserializer");
+
+        // 2. Create Kafka Consumer
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+
+        // 3. Subscribe to topic
+        consumer.subscribe(Collections.singletonList("orders"));
+
+        try {
+            // 4. Poll loop
+            while (true) {
+                ConsumerRecords<String, String> records =
+                        consumer.poll(Duration.ofMillis(100));
+
+                for (ConsumerRecord<String, String> record : records) {
+                    System.out.printf(
+                            "Received: topic=%s, partition=%d, offset=%d, key=%s, value=%s%n",
+                            record.topic(),
+                            record.partition(),
+                            record.offset(),
+                            record.key(),
+                            record.value()
+                    );
+                }
+
+                // 5. Commit offsets manually after processing
+                consumer.commitSync();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // 6. Close consumer gracefully
+            consumer.close();
         }
-        consumer.
-
-commitSync(); // Manual offset commit
+    }
 }
+
 ```
 
 - **group.id** Identifies the consumer group for coordination and offset tracking.

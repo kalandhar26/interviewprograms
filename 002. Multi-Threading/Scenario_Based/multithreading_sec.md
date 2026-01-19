@@ -121,6 +121,9 @@ class Resource {
 - Thread A calls countDown() after updating R, and Thread B waits on await() until the latch reaches zero.
 - Suitable for one-time or fixed-number notifications, such as initialization completion. Use CyclicBarrier if the signaling needs to be reusable.
 
+----------------------------------------------------------------------------
+
+
 ## 2. Design and implement a pure-Java order-processing subsystem that must satisfy the following non-functional and functional requirements: **Continuous Ingestion** Accept an unbounded stream of Order objects that arrive in real time. **Categorisation** Every Order carries a type field (e.g., “electronics”, “books”, “groceries”). The system must group orders by this type at runtime. **Sequential Consistency per Type** All orders that share the same type must be processed strictly in the order they arrive (FIFO). **Parallelism across Types** Orders of different types may be processed concurrently to maximise throughput.**Horizontal Elasticity** Order Volume: if millions of orders arrive, processing threads must scale up without manual tuning.**Type Cardinality:** new order types can appear at any moment; the system must automatically create the necessary processing resources without restart or code change. **Graceful Degradation** When traffic subsides, unused resources (threads) must be released.
 
 ```java
@@ -295,10 +298,11 @@ final class OrderProcessor {
     }
 }
 ```
-- Another Simpler way
+---------------------------------------------------
+- **Another Simpler way**
 
 ```java
- java.util.UUID;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.*;
 
@@ -392,3 +396,5 @@ class OrderDispatcher {
     }
 }
 ```
+-------------------------------------------------------
+

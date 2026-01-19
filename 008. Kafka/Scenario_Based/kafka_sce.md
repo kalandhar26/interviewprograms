@@ -2,11 +2,13 @@
 
 ### **1. Broker connectivity / bootstrap-servers**
 
-- Check the bootstrap-servers value in application.yml matches exactly what the broker advertises (hostname/IP and port).
+- Check the bootstrap-servers value in application.yml matches exactly what the broker advertises (hostname/IP and
+  port).
 - From inside the same Docker network / K8s Pod, run nc -vz <broker> 9092 or telnet <broker> 9092.
 - Enable DEBUG in logback-spring.xml to see the initial metadata fetch:
 
 ```xml
+
 <logger name="org.apache.kafka" level="DEBUG"/>
 ```
 
@@ -22,6 +24,7 @@ kubectl exec -it kafka-0 -- kafka-topics.sh --bootstrap-server localhost:9092 --
 - Create it explicitly or let Spring create it
 
 ```java
+
 @Configuration
 public class KafkaTopicConfig {
     @Bean
@@ -47,10 +50,11 @@ spring:
 - Add a global error handler so nothing is silently dropped
 
 ```java
+
 @Component
-public class ProducerErrorHandler implements ProducerListener<Object,Object> {
+public class ProducerErrorHandler implements ProducerListener<Object, Object> {
     @Override
-    public void onError(ProducerRecord<Object,Object> record, Exception ex) {
+    public void onError(ProducerRecord<Object, Object> record, Exception ex) {
         log.error("Send failed for {}", record, ex);
     }
 }
@@ -105,6 +109,7 @@ spring:
 - Either call kafkaTemplate.flush() or rely on the graceful shutdown hook (default in Spring Boot 3).
 
 ```java
+
 @DynamicPropertySource
 static void kafkaProps(DynamicPropertyRegistry r) {
     r.add("spring.kafka.producer.close-timeout", () -> "5s");
@@ -125,7 +130,8 @@ spring:
 
 ### **9. Partition assignment / key hash**
 
-- When the key is null and DefaultPartitioner is used, all messages go to a single partition. If that partition’s leader is offline, nothing is produced.
+- When the key is null and DefaultPartitioner is used, all messages go to a single partition. If that partition’s leader
+  is offline, nothing is produced.
 - Verify leadership
 
 ```bash
@@ -138,6 +144,7 @@ kubectl exec -it kafka-0 -- kafka-topics.sh \
 - From inside the same K8s pod
 
 ```java
+
 @SpringBootTest
 @Testcontainers
 class KafkaProducerIT {
@@ -149,7 +156,8 @@ class KafkaProducerIT {
         r.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
     }
 
-    @Autowired KafkaTemplate<String,String> template;
+    @Autowired
+    KafkaTemplate<String, String> template;
 
     @Test
     void shouldSendAndReceive() {
@@ -207,11 +215,12 @@ spring:
 - Make sure the method is discovered by Spring
 
 ```java
+
 @Component
 class OrderListener {
     @KafkaListener(id = "orderListener",
-                   topics = "orders",
-                   containerFactory = "kafkaManualAckContainerFactory")
+            topics = "orders",
+            containerFactory = "kafkaManualAckContainerFactory")
     public void listen(OrderDto dto, Acknowledgment ack) {
         log.info("Received {}", dto);
         orderService.save(dto);   // DB call
@@ -220,16 +229,18 @@ class OrderListener {
 }
 ```
 
-- If you accidentally place the @KafkaListener on a package-private class or forget @Component, the container never starts.
+- If you accidentally place the @KafkaListener on a package-private class or forget @Component, the container never
+  starts.
 
 ### **4. Check the in-JVM exception path**
 
 - Add a SeekToCurrentErrorHandler so poison pills don’t stall the partition
 
 ```java
+
 @Bean
-public ConcurrentKafkaListenerContainerFactory<?,?> kafkaManualAckContainerFactory(
-        ConsumerFactory<Object,Object> cf) {
+public ConcurrentKafkaListenerContainerFactory<?, ?> kafkaManualAckContainerFactory(
+        ConsumerFactory<Object, Object> cf) {
 
     var factory = new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(cf);
@@ -267,6 +278,7 @@ kubectl exec -it order-service-xxx -- \
 - If you use @Transactional on OrderService.save, make sure the transaction manager is Kafka-and-DB chained
 
 ```java
+
 @Transactional("kafkaTransactionManager")   // ChainedKafkaTransactionManager
 public void save(OrderDto dto) {
     repo.save(map(dto));
@@ -321,6 +333,7 @@ echo $SPRING_DATASOURCE_PASSWORD
 - Use the embedded broker pattern
 
 ```java
+
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = NONE)
 @Testcontainers
@@ -342,15 +355,17 @@ class OrderListenerIT {
         r.add("spring.datasource.password", postgres::getPassword);
     }
 
-    @Autowired KafkaTemplate<String,OrderDto> template;
-    @Autowired OrderRepository repo;
+    @Autowired
+    KafkaTemplate<String, OrderDto> template;
+    @Autowired
+    OrderRepository repo;
 
     @Test
     void shouldPersistOrder() throws Exception {
         OrderDto dto = new OrderDto("ORD-1", BigDecimal.TEN);
         template.send("orders", dto.getId(), dto).get();
         await().atMost(10, TimeUnit.SECONDS)
-               .untilAsserted(() -> assertThat(repo.findById("ORD-1")).isPresent());
+                .untilAsserted(() -> assertThat(repo.findById("ORD-1")).isPresent());
     }
 }
 ```
@@ -364,9 +379,11 @@ class OrderListenerIT {
 
 ### **1. Quick but naïve (works for dev only)**
 
-- Sleep inside the listener; not recommended for prod because it keeps the partition thread busy and can trigger a rebalance.
+- Sleep inside the listener; not recommended for prod because it keeps the partition thread busy and can trigger a
+  rebalance.
 
 ```java
+
 @KafkaListener(topics = "orders")
 public void listen(OrderDto dto) throws InterruptedException {
     Thread.sleep(Duration.ofSeconds(5));   // blocks!
@@ -376,12 +393,14 @@ public void listen(OrderDto dto) throws InterruptedException {
 
 ### **2. Scalable pattern — Async hand-off + delayed executor**
 
-- Poll immediately, enqueue the record, and let a ScheduledExecutorService or Spring’s TaskScheduler run the real work later.
+- Poll immediately, enqueue the record, and let a ScheduledExecutorService or Spring’s TaskScheduler run the real work
+  later.
 - This (ScheduledExecutorService with manual ack) gives the best balance between simplicity and scalability.
 
 #### **2.1. Configuration**
 
 ```java
+
 @Configuration
 class DelayConfig {
 
@@ -389,7 +408,7 @@ class DelayConfig {
     public ScheduledExecutorService delayedExecutor() {
         // virtual threads → 1 scheduler per core
         return Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors(),
-                                                Thread.ofVirtual().factory());
+                Thread.ofVirtual().factory());
     }
 }
 ```
@@ -397,6 +416,7 @@ class DelayConfig {
 #### **2.2 Listener (manual ack to avoid commit before processing)**
 
 ```java
+
 @Component
 class DelayedConsumer {
 
@@ -406,14 +426,14 @@ class DelayedConsumer {
     @KafkaListener(topics = "orders", containerFactory = "manualAckFactory")
     public void listen(OrderDto dto, Acknowledgment ack) {
         delayedExecutor.schedule(
-            () -> {
-                try {
-                    orderService.save(dto);
-                } finally {
-                    ack.acknowledge();   // commit offset after the delay
-                }
-            },
-            5, TimeUnit.SECONDS);        // configurable via @Value
+                () -> {
+                    try {
+                        orderService.save(dto);
+                    } finally {
+                        ack.acknowledge();   // commit offset after the delay
+                    }
+                },
+                5, TimeUnit.SECONDS);        // configurable via @Value
     }
 }
 ```
@@ -421,10 +441,11 @@ class DelayedConsumer {
 - Container factory
 
 ```java
+
 @Bean
-public ConcurrentKafkaListenerContainerFactory<String,OrderDto> manualAckFactory(
-        ConsumerFactory<String,OrderDto> cf) {
-    var factory = new ConcurrentKafkaListenerContainerFactory<String,OrderDto>();
+public ConcurrentKafkaListenerContainerFactory<String, OrderDto> manualAckFactory(
+        ConsumerFactory<String, OrderDto> cf) {
+    var factory = new ConcurrentKafkaListenerContainerFactory<String, OrderDto>();
     factory.setConsumerFactory(cf);
     factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
     return factory;
@@ -434,6 +455,7 @@ public ConcurrentKafkaListenerContainerFactory<String,OrderDto> manualAckFactory
 ### **3. Spring-native alternative — TaskScheduler + @Async**
 
 ```java
+
 @Component
 class DelayedConsumer {
 
@@ -443,11 +465,11 @@ class DelayedConsumer {
     @KafkaListener(topics = "orders", containerFactory = "manualAckFactory")
     public void listen(OrderDto dto, Acknowledgment ack) {
         scheduler.schedule(
-            () -> {
-                orderService.save(dto);
-                ack.acknowledge();
-            },
-            Instant.now().plusSeconds(5));
+                () -> {
+                    orderService.save(dto);
+                    ack.acknowledge();
+                },
+                Instant.now().plusSeconds(5));
     }
 }
 ```
@@ -463,6 +485,7 @@ record DelayedRecord(OrderDto dto, long fireAfterNanos) implements Delayed {
     public long getDelay(TimeUnit unit) {
         return unit.convert(fireAfterNanos - System.nanoTime(), TimeUnit.NANOSECONDS);
     }
+
     public int compareTo(Delayed o) {
         return Long.compare(getDelay(TimeUnit.NANOSECONDS), o.getDelay(TimeUnit.NANOSECONDS));
     }
@@ -490,7 +513,8 @@ class DelayedQueueWorker {
 
 ### **5. Cloud-ready variant — external delayed topic**
 
-- If the delay must survive pod restarts, publish the original message to a retry topic with a TTL (e.g., AWS MSK + SQS DLQ) or use Kafka Streams’ punctuate logic.
+- If the delay must survive pod restarts, publish the original message to a retry topic with a TTL (e.g., AWS MSK + SQS
+  DLQ) or use Kafka Streams’ punctuate logic.
 
 ### **6. Configuration snippet (application.yml)**
 
@@ -503,6 +527,7 @@ app:
 - Use it in the scheduled call
 
 ```java
+
 @Value("${app.kafka.processing-delay}")
 private Duration delay;
 ```
@@ -573,6 +598,7 @@ spring:
 - This prevents committing offsets for unprocessed messages:
 
 ```java
+
 @KafkaListener(topics = "orders", groupId = "order-group")
 @Transactional("kafkaTransactionManager")
 public void consume(String message) {
@@ -584,13 +610,14 @@ public void consume(String message) {
 #### **3.2 No Manual Ack**
 
 ```java
+
 @Configuration
 class KafkaConfig {
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<?,?> kafkaListenerContainerFactory(
-            ConsumerFactory<Object,Object> cf,
-            KafkaTransactionManager<?,?> kafkaTm,
+    public ConcurrentKafkaListenerContainerFactory<?, ?> kafkaListenerContainerFactory(
+            ConsumerFactory<Object, Object> cf,
+            KafkaTransactionManager<?, ?> kafkaTm,
             JpaTransactionManager jpaTm) {
 
         var factory = new ConcurrentKafkaListenerContainerFactory<>();
@@ -610,6 +637,7 @@ class KafkaConfig {
 ### **4. Listener method – just annotate with Spring TX**
 
 ```java
+
 @Component
 class OrderListener {
 
@@ -642,21 +670,24 @@ spring.kafka.consumer.properties.partition.assignment.strategy=org.apache.kafka.
 ### **1. Pods / instances → All use same group-id → partitions are load-balanced**
 
 - In Kafka, a consumer group ensures that each partition is consumed by only one instance at a time.
-- If you deploy multiple pods (Spring Boot Kafka consumers) with the same group-id, Kafka will split the topic partitions among them.
+- If you deploy multiple pods (Spring Boot Kafka consumers) with the same group-id, Kafka will split the topic
+  partitions among them.
 - This avoids duplicate processing and distributes the workload.
 - If each pod had a different group-id, every pod would get all messages → duplicate work.
 
 ### **2. transaction-id-prefix → Unique per instance: Kubernetes appends pod name via env var**
 
 - Kafka transactions require a unique transaction ID per producer instance.
-- In Kubernetes, multiple pods run the same code. If they all use the same transaction-id-prefix, Kafka will see them as the same producer → conflicts, fencing errors, or aborted transactions.
+- In Kubernetes, multiple pods run the same code. If they all use the same transaction-id-prefix, Kafka will see them as
+  the same producer → conflicts, fencing errors, or aborted transactions.
 - Solution: Generate a unique prefix for each pod.
 
 ```yaml
 spring.kafka.producer.transaction-id-prefix: tx-${HOSTNAME}-
 ```
 
-- HOSTNAME is a Kubernetes environment variable that contains the pod name → ensures each pod gets its own transaction ID.
+- HOSTNAME is a Kubernetes environment variable that contains the pod name → ensures each pod gets its own transaction
+  ID.
 
 ### **3. Retries → Let the container retry (DLQ after max attempts) instead of naked @Retryable**
 
@@ -668,13 +699,15 @@ spring.kafka.producer.transaction-id-prefix: tx-${HOSTNAME}-
 
 ### **4. Exactly-once to downstream → If you produce to another topic, use the same transaction**
 
-- If your consumer reads from one Kafka topic and then produces messages to another topic (or DB), you need to do it inside one Kafka transaction:
+- If your consumer reads from one Kafka topic and then produces messages to another topic (or DB), you need to do it
+  inside one Kafka transaction:
 - Consume message → process → produce result → commit offset → all as one atomic unit.
 - This ensures exactly-once semantics
 - If the consumer crashes, neither the message offset nor the produced message will be committed.
 - When restarted, Kafka will redeliver the original message → no data loss, no duplicates.
 
 ```java
+
 @KafkaListener(topics = "input-topic", groupId = "group1")
 @Transactional("kafkaTransactionManager")
 public void consumeAndForward(String message) {
@@ -708,6 +741,7 @@ app:
 - Routing strategy
 
 ```java
+
 @Component
 public class TopicRouter {
 
@@ -715,10 +749,10 @@ public class TopicRouter {
 
     public TopicRouter(@Value("${app.kafka.topics}") Map<String, String> cfg) {
         this.map = cfg.entrySet()
-                      .stream()
-                      .collect(Collectors.toMap(
-                               e -> EventType.valueOf(e.getKey()),
-                               Map.Entry::getValue));
+                .stream()
+                .collect(Collectors.toMap(
+                        e -> EventType.valueOf(e.getKey()),
+                        Map.Entry::getValue));
     }
 
     public String topicFor(EventType type) {
@@ -730,6 +764,7 @@ public class TopicRouter {
 - Sender Service
 
 ```java
+
 @Service
 public class EventPublisher {
 
@@ -753,7 +788,8 @@ public class EventPublisher {
 - Java record for contract (immutable)
 
 ```java
-public record Event(String key, EventType type, Object body) { }
+public record Event(String key, EventType type, Object body) {
+}
 
 public enum EventType {
     ORDER_CREATED, ORDER_SHIPPED, PAYMENT_SUCCESS
@@ -763,14 +799,18 @@ public enum EventType {
 - Unit test with embedded broker
 
 ```java
+
 @SpringBootTest
 @EmbeddedKafka(partitions = 1,
-               topics = {"orders.created", "orders.shipped", "payments.success"})
+        topics = {"orders.created", "orders.shipped", "payments.success"})
 class DynamicTopicIT {
 
-    @Autowired KafkaTemplate<String, Object> kafka;
-    @Autowired EventPublisher publisher;
-    @Autowired EmbeddedKafkaBroker broker;
+    @Autowired
+    KafkaTemplate<String, Object> kafka;
+    @Autowired
+    EventPublisher publisher;
+    @Autowired
+    EmbeddedKafkaBroker broker;
 
     @Test
     void shouldRouteToCorrectTopic() throws Exception {
@@ -788,11 +828,12 @@ class DynamicTopicIT {
 ### **4. If you need per-topic producer configs (different acks, SSL, …) use Spring’s RoutingKafkaTemplate**
 
 ```java
+
 @Bean
 public RoutingKafkaTemplate routingTemplate(Map<String, Object> commonProps) {
-    Map<String, ProducerFactory<Object,Object>> map = Map.of(
-        "orders.created",  new DefaultKafkaProducerFactory<>(commonProps, new StringSerializer(), new JsonSerializer<>()),
-        "orders.shipped",  new DefaultKafkaProducerFactory<>(commonProps, new StringSerializer(), new JsonSerializer<>())
+    Map<String, ProducerFactory<Object, Object>> map = Map.of(
+            "orders.created", new DefaultKafkaProducerFactory<>(commonProps, new StringSerializer(), new JsonSerializer<>()),
+            "orders.shipped", new DefaultKafkaProducerFactory<>(commonProps, new StringSerializer(), new JsonSerializer<>())
     );
     return new RoutingKafkaTemplate(map);
 }
@@ -805,10 +846,11 @@ public RoutingKafkaTemplate routingTemplate(Map<String, Object> commonProps) {
 ### **5.1Streams topology**
 
 ```java
+
 @Bean
 public KStream<String, Event> topology(StreamsBuilder builder) {
     KStream<String, Event> source = builder.stream("events.in",
-                                                   Consumed.with(Serdes.String(), new JsonSerde<>(Event.class)));
+            Consumed.with(Serdes.String(), new JsonSerde<>(Event.class)));
 
     TopicNameExtractor<String, Event> extractor = (key, value, ctx) ->
             "events." + value.type().name().toLowerCase();
@@ -823,12 +865,47 @@ public KStream<String, Event> topology(StreamsBuilder builder) {
 ### **5.2 Fine-grained branching**
 
 ```java
-source.split()
-      .branch((k, v) -> v.type() == EventType.ORDER_CREATED,
-              Branched.withConsumer(ks -> ks.to("orders.created")))
-      .branch((k, v) -> v.type() == EventType.PAYMENT_SUCCESS,
-              Branched.withConsumer(ks -> ks.to("payments.success")))
-      .noDefaultBranch();
+package com.example.streams;
+
+import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.kstream.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.support.serializer.JsonSerde;
+
+@Configuration
+public class EventRoutingTopology {
+
+    @Bean
+    public KStream<String, Event> eventTopology(StreamsBuilder builder) {
+
+        // 1. Source stream
+        KStream<String, Event> source =
+                builder.stream(
+                        "events.in",
+                        Consumed.with(Serdes.String(), new JsonSerde<>(Event.class))
+                );
+
+        // 2. Split stream based on event type
+        source.split()
+                .branch(
+                        (key, value) -> value.getType() == EventType.ORDER_CREATED,
+                        Branched.withConsumer(ks ->
+                                ks.to("orders.created",
+                                        Produced.with(Serdes.String(), new JsonSerde<>(Event.class)))
+                        ))
+                .branch(
+                        (key, value) -> value.getType() == EventType.PAYMENT_SUCCESS,
+                        Branched.withConsumer(ks ->
+                                ks.to("payments.success",
+                                        Produced.with(Serdes.String(), new JsonSerde<>(Event.class)))
+                        ))
+                .noDefaultBranch();
+
+        // 3. Return source stream (optional, useful for testing)
+        return source;
+    }
+}
 ```
 
 ### **6. Consumer-side dynamic routing (subscribing at runtime)**
@@ -836,13 +913,15 @@ source.split()
 #### **6.1 Adding topics on-the-fly to an existing listener**
 
 ```java
+
 @Component
 public class DynamicListener {
 
-    @Autowired KafkaListenerEndpointRegistry registry;
+    @Autowired
+    KafkaListenerEndpointRegistry registry;
 
     public void addTopic(String topic) {
-        var factory = (ConcurrentKafkaListenerContainerFactory<?,?>) registry.getListenerContainer("dynamicGroup").getContainerProperties().getConsumerFactory();
+        var factory = (ConcurrentKafkaListenerContainerFactory<?, ?>) registry.getListenerContainer("dynamicGroup").getContainerProperties().getConsumerFactory();
         registry.getListenerContainer("dynamicGroup").addTopics(topic);
     }
 }
@@ -851,10 +930,11 @@ public class DynamicListener {
 #### **6.2 Programmatic listener container (no @KafkaListener)**
 
 ```java
+
 @Bean
-public ConcurrentMessageListenerContainer<String, Object> dynamicConsumer(ConsumerFactory<String,Object> cf) {
+public ConcurrentMessageListenerContainer<String, Object> dynamicConsumer(ConsumerFactory<String, Object> cf) {
     var props = new ContainerProperties(Pattern.compile("orders\\..*")); // regex
-    props.setMessageListener((MessageListener<String,Object>) record -> process(record));
+    props.setMessageListener((MessageListener<String, Object>) record -> process(record));
     return new ConcurrentMessageListenerContainer<>(cf, props);
 }
 ```
@@ -871,6 +951,7 @@ public ConcurrentMessageListenerContainer<String, Object> dynamicConsumer(Consum
 - **Basic Configuration**
 
 ```java
+
 @Configuration
 public class KafkaProducerConfig {
 
@@ -893,6 +974,7 @@ public class KafkaProducerConfig {
 - **Messgae Routing Service**
 
 ```java
+
 @Service
 public class DynamicTopicProducerService {
 
@@ -904,17 +986,17 @@ public class DynamicTopicProducerService {
     public void sendToDynamicTopic(MessageDTO message) {
         String topic = determineTopic(message);
         ListenableFuture<SendResult<String, String>> future =
-            kafkaTemplate.send(topic, message.getKey(), message.getContent());
+                kafkaTemplate.send(topic, message.getKey(), message.getContent());
 
         future.addCallback(
-            result -> handleSuccess(message, topic, result),
-            ex -> handleFailure(message, topic, ex)
+                result -> handleSuccess(message, topic, result),
+                ex -> handleFailure(message, topic, ex)
         );
     }
 
     private String determineTopic(MessageDTO message) {
         // Implement your dynamic routing logic here
-        switch(message.getType()) {
+        switch (message.getType()) {
             case "ORDER":
                 return message.isPriority() ? "priority-orders" : "normal-orders";
             case "PAYMENT":
@@ -928,21 +1010,21 @@ public class DynamicTopicProducerService {
 
     private void handleSuccess(MessageDTO message, String topic, SendResult<String, String> result) {
         log.info("Sent message=[{}] to topic=[{}] with offset=[{}]",
-            message.getContent(),
-            topic,
-            result.getRecordMetadata().offset());
+                message.getContent(),
+                topic,
+                result.getRecordMetadata().offset());
     }
 
     private void handleFailure(MessageDTO message, String topic, Throwable ex) {
         log.error("Unable to send message=[{}] to topic=[{}] due to: {}",
-            message.getContent(),
-            topic,
-            ex.getMessage());
+                message.getContent(),
+                topic,
+                ex.getMessage());
         // Implement retry or dead-letter queue logic here
     }
 }
 
-# DTO Class
+// DTO Class
 public class MessageDTO {
     private String type;
     private String key;
@@ -956,6 +1038,7 @@ public class MessageDTO {
 - **Topic Creation Verification**
 
 ```java
+
 @Autowired
 private KafkaAdmin kafkaAdmin;
 
@@ -981,11 +1064,11 @@ public void sendWithHeaders(MessageDTO message) {
     String topic = determineTopic(message);
 
     Message<String> kafkaMessage = MessageBuilder
-        .withPayload(message.getContent())
-        .setHeader(KafkaHeaders.TOPIC, topic)
-        .setHeader(KafkaHeaders.KEY, message.getKey())
-        .setHeader("X-Custom-Header", message.getCustomProperty())
-        .build();
+            .withPayload(message.getContent())
+            .setHeader(KafkaHeaders.TOPIC, topic)
+            .setHeader(KafkaHeaders.KEY, message.getKey())
+            .setHeader("X-Custom-Header", message.getCustomProperty())
+            .build();
 
     kafkaTemplate.send(kafkaMessage);
 }
@@ -1002,6 +1085,7 @@ spring:
 ```
 
 ```java
+
 @Transactional
 public void sendTransactional(MessageDTO message) {
     String topic1 = determinePrimaryTopic(message);
@@ -1036,6 +1120,7 @@ spring:
 - Producer Implementation
 
 ```java
+
 @Service
 public class ReliableKafkaProducer {
 
@@ -1046,15 +1131,15 @@ public class ReliableKafkaProducer {
         kafkaTemplate.executeInTransaction(t -> {
             try {
                 ListenableFuture<SendResult<String, String>> future =
-                    t.send(topic, key, message);
+                        t.send(topic, key, message);
 
                 return future.addCallback(
-                    result -> log.info("Sent durable message to {}: {}",
-                        topic, result.getRecordMetadata()),
-                    ex -> {
-                        log.error("Failed to send message", ex);
-                        throw new RuntimeException("Send failed", ex);
-                    }
+                        result -> log.info("Sent durable message to {}: {}",
+                                topic, result.getRecordMetadata()),
+                        ex -> {
+                            log.error("Failed to send message", ex);
+                            throw new RuntimeException("Send failed", ex);
+                        }
                 );
             } catch (Exception e) {
                 log.error("Transaction failed", e);
@@ -1095,12 +1180,13 @@ spring:
 - Consumer Implementation
 
 ```java
+
 @Service
 public class ReliableKafkaConsumer {
 
     @KafkaListener(topics = "${app.kafka.topic}")
     public void consume(ConsumerRecord<String, String> record,
-                       Acknowledgment acknowledgment) {
+                        Acknowledgment acknowledgment) {
         try {
             // Process message
             processMessage(record.value());
@@ -1116,9 +1202,9 @@ public class ReliableKafkaConsumer {
     }
 
     @RetryableTopic(
-        attempts = "3",
-        backoff = @Backoff(delay = 1000, multiplier = 2.0),
-        dltTopicSuffix = "-dlt")
+            attempts = "3",
+            backoff = @Backoff(delay = 1000, multiplier = 2.0),
+            dltTopicSuffix = "-dlt")
     @KafkaListener(topics = "${app.kafka.topic}")
     public void processWithRetry(ConsumerRecord<String, String> record) {
         // Your processing logic
@@ -1142,6 +1228,7 @@ kafka-topics --create \
 - Monitoring and Alerts
 
 ```java
+
 @Bean
 public MicrometerProducerListener<String, String> producerListener(MeterRegistry registry) {
     return new MicrometerProducerListener<>(registry);
@@ -1156,16 +1243,17 @@ public MicrometerConsumerListener<String, String> consumerListener(MeterRegistry
 - Dead Letter Queue Set up
 
 ```java
+
 @Bean
 public DeadLetterPublishingRecoverer dlqRecoverer(KafkaTemplate<String, String> template) {
     return new DeadLetterPublishingRecoverer(template,
-        (record, ex) -> new TopicPartition(record.topic() + "-dlt", -1));
+            (record, ex) -> new TopicPartition(record.topic() + "-dlt", -1));
 }
 
 @Bean
 public DefaultErrorHandler errorHandler(DeadLetterPublishingRecoverer recoverer) {
     return new DefaultErrorHandler(recoverer,
-        new FixedBackOff(1000L, 3L));  // 3 retries with 1s interval
+            new FixedBackOff(1000L, 3L));  // 3 retries with 1s interval
 }
 ```
 
@@ -1193,12 +1281,14 @@ public DefaultErrorHandler errorHandler(DeadLetterPublishingRecoverer recoverer)
 
 ## 7. Your Spring-Boot consumer is lagging. What concrete steps (config, code, infra) do you take to scale out & speed up processing? kafka consumer with a high volume of messages. The consumer is falling behind in processing the messages and you need to scale the consumer application to handle the load?
 
-- To address a Kafka consumer lagging behind due to high message volume, you can scale the consumer application by leveraging Kafka’s partitioning, increasing consumer instances, enabling concurrency within consumers, and optimizing message processing with batching.
+- To address a Kafka consumer lagging behind due to high message volume, you can scale the consumer application by
+  leveraging Kafka’s partitioning, increasing consumer instances, enabling concurrency within consumers, and optimizing
+  message processing with batching.
 
 - Rule of thumb: target partitions = expected peak pods × 3.
 
 | Step                   | Command / Config                                         |
-| ---------------------- | -------------------------------------------------------- |
+|------------------------|----------------------------------------------------------|
 | Re-partition the topic | `kafka-topics.sh --alter --topic orders --partitions 18` |
 | Scale the Deployment   | `kubectl scale deploy order-service --replicas=6`        |
 
@@ -1207,67 +1297,84 @@ public DefaultErrorHandler errorHandler(DeadLetterPublishingRecoverer recoverer)
 - Kafka’s unit of parallelism is the partition.
 - Add more partitions → add more pods.
 - **Increase Consumer Instances**
-- Kafka’s consumer group mechanism allows multiple consumers in the same group to process different partitions in parallel.
-- To scale horizontally, deploy additional instances of your Spring Boot application (e.g., by increasing the number of pods in Kubernetes).
-- Each consumer instance will be assigned a subset of the topic’s partitions, distributing the load ensure the number of consumer instances does not exceed the number of partitions, as extra consumers will remain idle.
+- Kafka’s consumer group mechanism allows multiple consumers in the same group to process different partitions in
+  parallel.
+- To scale horizontally, deploy additional instances of your Spring Boot application (e.g., by increasing the number of
+  pods in Kubernetes).
+- Each consumer instance will be assigned a subset of the topic’s partitions, distributing the load ensure the number of
+  consumer instances does not exceed the number of partitions, as extra consumers will remain idle.
 - **Increase Topic Partitions**
-- The number of partitions in a Kafka topic determines the maximum parallelism for consumers in a consumer group, as each partition is consumed by only one consumer at a time.
-- If the topic has too few partitions, increase the partition count to allow more consumer instances to process messages in parallel. Note that increasing partitions requires careful consideration, as it cannot be undone without data migration, and it may affect message ordering if keys are used.
+- The number of partitions in a Kafka topic determines the maximum parallelism for consumers in a consumer group, as
+  each partition is consumed by only one consumer at a time.
+- If the topic has too few partitions, increase the partition count to allow more consumer instances to process messages
+  in parallel. Note that increasing partitions requires careful consideration, as it cannot be undone without data
+  migration, and it may affect message ordering if keys are used.
 - **Enable Concurrency in @KafkaListener**
-- Use the concurrency property in the @KafkaListener annotation or configure the ConcurrentKafkaListenerContainerFactory to create multiple listener threads within a single consumer instance.
-  -This allows a single consumer to process messages from multiple partitions concurrently, improving throughput without deploying additional instances.
+- Use the concurrency property in the @KafkaListener annotation or configure the ConcurrentKafkaListenerContainerFactory
+  to create multiple listener threads within a single consumer instance.
+  -This allows a single consumer to process messages from multiple partitions concurrently, improving throughput without
+  deploying additional instances.
   -Alternatively, enable Spring’s @EnableAsync to process messages asynchronously.
 
 - **Concurrent Consumer Configuration**
+
 ```java
+
 @Configuration
 @EnableAsync
 public class KafkaConfig {
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> 
-      kafkaListenerContainerFactory(ConsumerFactory<String, String> consumerFactory) {
-        
+    public ConcurrentKafkaListenerContainerFactory<String, String>
+    kafkaListenerContainerFactory(ConsumerFactory<String, String> consumerFactory) {
+
         ConcurrentKafkaListenerContainerFactory<String, String> factory =
-            new ConcurrentKafkaListenerContainerFactory<>();
+                new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
-        factory.setConcurrency(5);  # 5 threads per instance
+        factory.setConcurrency(5);  // 5 threads per instance
         factory.getContainerProperties().setPollTimeout(3000);
-        factory.setBatchListener(true);  # Enable batch processing
+        factory.setBatchListener(true);  // Enable batch processing
         return factory;
     }
 }
 ```
+
 - **Batch Processing Implementation**
+
 ```java
+
 @Service
 public class HighVolumeConsumer {
 
-    @KafkaListener(topics = "high-volume-topic", 
-                  containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "high-volume-topic",
+            containerFactory = "kafkaListenerContainerFactory")
     public void processBatch(List<ConsumerRecord<String, String>> records) {
         // Bulk database insert example
         jdbcTemplate.batchUpdate(
-            "INSERT INTO messages(id, content) VALUES(?, ?)",
-            new BatchPreparedStatementSetter() {
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    ps.setString(1, records.get(i).key());
-                    ps.setString(2, records.get(i).value());
-                }
-                public int getBatchSize() {
-                    return records.size();
-                }
-            });
+                "INSERT INTO messages(id, content) VALUES(?, ?)",
+                new BatchPreparedStatementSetter() {
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setString(1, records.get(i).key());
+                        ps.setString(2, records.get(i).value());
+                    }
+
+                    public int getBatchSize() {
+                        return records.size();
+                    }
+                });
     }
 }
 ```
+
 - **Dynamic Scaling Controller**
+
 ```java
-@Scheduled(fixedRate = 30000)  # Every 30 seconds
+
+@Scheduled(fixedRate = 30000)  // Every 30 seconds
 public void checkConsumerLag() {
     Map<TopicPartition, Long> lags = kafkaConsumerLagChecker.getLag();
     long totalLag = lags.values().stream().mapToLong(Long::longValue).sum();
-    
+
     if (totalLag > 100000) {
         scalingService.scaleOut();
     } else if (totalLag < 10000) {
@@ -1277,18 +1384,21 @@ public void checkConsumerLag() {
 ```
 
 - **Performance Optimization**
+
 ```java
+
 @Bean
 public ConsumerFactory<String, String> consumerFactory() {
     Map<String, Object> props = new HashMap<>();
-    props.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, 1048576);  # 1MB
-    props.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, 500);    # 500ms
+    props.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, 1048576);  // 1MB
+    props.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, 500);    // 500ms
     props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 1000);
     return new DefaultKafkaConsumerFactory<>(props);
 }
 ```
 
 - **Partition Assignment Strategy**
+
 ```yaml
 spring:
   kafka:
@@ -1296,16 +1406,20 @@ spring:
       properties:
         partition.assignment.strategy: org.apache.kafka.clients.consumer.RoundRobinAssignor
 ```
+
 - **Monitoring and Metrics**
+
 ```java
+
 @Bean
 public MicrometerConsumerListener<String, String> consumerMetrics(MeterRegistry registry) {
-    MicrometerConsumerListener<String, String> listener = 
-        new MicrometerConsumerListener<>(registry);
+    MicrometerConsumerListener<String, String> listener =
+            new MicrometerConsumerListener<>(registry);
     listener.setConsumerTimersEnabled(true);
     return listener;
 }
 ```
+
 - **Key Metrics to Monitor**
 - Consumer lag (records behind)
 - Poll rate and duration
@@ -1313,95 +1427,105 @@ public MicrometerConsumerListener<String, String> consumerMetrics(MeterRegistry 
 - Error rates
 
 #### Best Practices
+
 - **Consumer Group Design**
 - Keep consumers in the same group homogeneous
 - Maintain 1:1 ratio between partitions and consumers for maximum throughput
 - **Error Handling**
+
 ```java
+
 @Bean
 public DefaultErrorHandler errorHandler() {
     return new DefaultErrorHandler(
-        (record, exception) -> {
-            // Dead letter queue logic
-        },
-        new FixedBackOff(1000, 3)  # 3 retries with 1s interval
+            (record, exception) -> {
+                // Dead letter queue logic
+            },
+            new FixedBackOff(1000, 3)  // 3 retries with 1s interval
     );
 }
 ```
+
 - Resource Allocation:
 - Ensure adequate CPU/Memory for each consumer instance
 - Configure JVM for large heaps if processing large batches
 - Consider SSD storage for stateful consumers
 
-
 ### **2. Use virtual threads (Java 21) to raise per-pod concurrency**
 
 - Scaling Kafka Consumers with Java 21 Virtual Threads
 - Virtual Threads Configuration
+
 ```java
+
 @Configuration
 public class KafkaVirtualThreadConfig {
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> 
-        kafkaListenerContainerFactory(ConsumerFactory<String, String> consumerFactory) {
-        
+    public ConcurrentKafkaListenerContainerFactory<String, String>
+    kafkaListenerContainerFactory(ConsumerFactory<String, String> consumerFactory) {
+
         var factory = new ConcurrentKafkaListenerContainerFactory<String, String>();
         factory.setConsumerFactory(consumerFactory);
-        
+
         // Optimal concurrency setup
         int concurrency = Runtime.getRuntime().availableProcessors() * 2;
         factory.setConcurrency(concurrency);
-        
+
         // Virtual threads configuration
         factory.setContainerCustomizer(container -> {
             container.setThreadFactory(Thread.ofVirtual().name("kafka-vthread-", 0).factory());
             container.getContainerProperties().setPollTimeout(Duration.ofSeconds(3));
         });
-        
+
         // Enable batch processing
         factory.setBatchListener(true);
-        
+
         return factory;
     }
 }
 ```
+
 - Consumer Implementation with Virtual Threads
+
 ```java
+
 @Service
 public class VirtualThreadConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(VirtualThreadConsumer.class);
-    
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @KafkaListener(topics = "${kafka.topic}", 
-                  groupId = "${kafka.group}", 
-                  containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "${kafka.topic}",
+            groupId = "${kafka.group}",
+            containerFactory = "kafkaListenerContainerFactory")
     public void processBatch(List<ConsumerRecord<String, String>> records) {
-        log.debug("Processing batch of {} records on virtual thread {}", 
-                 records.size(), Thread.currentThread());
-        
+        log.debug("Processing batch of {} records on virtual thread {}",
+                records.size(), Thread.currentThread());
+
         // Batch database insert
         jdbcTemplate.batchUpdate(
-            "INSERT INTO messages (id, content) VALUES (?, ?)",
-            new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    ps.setString(1, records.get(i).key());
-                    ps.setString(2, records.get(i).value());
-                }
-                
-                @Override
-                public int getBatchSize() {
-                    return records.size();
-                }
-            });
+                "INSERT INTO messages (id, content) VALUES (?, ?)",
+                new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setString(1, records.get(i).key());
+                        ps.setString(2, records.get(i).value());
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return records.size();
+                    }
+                });
     }
 }
 ```
+
 - Performance Optimization Settings
+
 ```yaml
 # application.yml
 spring:
@@ -1418,40 +1542,49 @@ spring:
         max.partition.fetch.bytes: 1048576 # 1MB
         receive.buffer.bytes: 65536
 ```
+
 - Error Handling with Virtual Threads
+
 ```java
+
 @Bean
 public DefaultErrorHandler errorHandler() {
     var exponentialBackOff = new ExponentialBackOff(1000, 2);
     exponentialBackOff.setMaxInterval(16000);
     exponentialBackOff.setMaxElapsedTime(60000);
-    
+
     return new DefaultErrorHandler(
-        (consumerRecord, exception) -> {
-            log.error("Failed to process record: {}", consumerRecord, exception);
-            // Dead letter queue logic here
-        },
-        exponentialBackOff
+            (consumerRecord, exception) -> {
+                log.error("Failed to process record: {}", consumerRecord, exception);
+                // Dead letter queue logic here
+            },
+            exponentialBackOff
     );
 }
 ```
+
 - Monitoring Virtual Thread Performance
+
 ```java
+
 @Bean
 public MeterRegistryCustomizer<MeterRegistry> metrics() {
     return registry -> {
         registry.config().commonTags("application", "kafka-virtual-thread-consumer");
-        
+
         // Track virtual thread creation
         Metrics.addRegistry(new SimpleMeterRegistry());
-        ThreadGauge.monitor("kafka.virtual.threads", 
-            Thread.ofVirtual().factory(),
-            new ArrayList<>());
+        ThreadGauge.monitor("kafka.virtual.threads",
+                Thread.ofVirtual().factory(),
+                new ArrayList<>());
     };
 }
 ```
+
 ### **3. Kafka Consumer Performance Tuning Configuration**
+
 - **Optimal Consumer Settings**
+
 ```yaml
 # application.yml
 spring:
@@ -1462,48 +1595,54 @@ spring:
       max-poll-interval-ms: 300000           # 5 minute grace period (default: 5m)
       fetch-min-bytes: 16384                 # 16KB minimum fetch size
       fetch-max-wait-ms: 100                 # Wait up to 100ms for fetch.min.bytes
-      
+
       # Network/performance
       fetch-max-bytes: 52428800              # 50MB max partition fetch
       connections-max-idle-ms: 540000        # 9 minutes (match AWS ELB timeout)
       request-timeout-ms: 40000              # 40s request timeout
-      
+
       # Heartbeat settings to prevent rebalances
       heartbeat-interval-ms: 3000            # 3s heartbeat
       session-timeout-ms: 45000              # 45s session timeout (must be >3x heartbeat)
-      
+
       # Memory management
       receive-buffer-bytes: 65536            # 64KB socket buffer
       max-partition-fetch-bytes: 1048576     # 1MB per partition
 ```
+
 - Container Factory Configuration
+
 ```java
+
 @Bean
-public ConcurrentKafkaListenerContainerFactory<String, String> 
-    kafkaListenerContainerFactory(ConsumerFactory<String, String> consumerFactory) {
-    
+public ConcurrentKafkaListenerContainerFactory<String, String>
+kafkaListenerContainerFactory(ConsumerFactory<String, String> consumerFactory) {
+
     var factory = new ConcurrentKafkaListenerContainerFactory<String, String>();
     factory.setConsumerFactory(consumerFactory);
-    
+
     // Critical performance settings
     factory.getContainerProperties().setPollTimeout(3000);  // 3s poll timeout
     factory.getContainerProperties().setAckMode(AckMode.BATCH);  // Commit after batch
-    
+
     // Pause/resume instead of rebalance
     factory.getContainerProperties().setPauseEnabled(true);
     factory.setPauseAfterOOMError(true);
-    
+
     return factory;
 }
 ```
+
 - Listener Implementation with Flow Control
+
 ```java
+
 @KafkaListener(topics = "high-volume", containerFactory = "kafkaListenerContainerFactory")
 public void processBatch(List<ConsumerRecord<String, String>> records) {
     try {
         // Batch processing with timeout
         CompletableFuture.runAsync(() -> processRecords(records))
-            .get(250, TimeUnit.MILLISECONDS);  // Timeout per batch
+                .get(250, TimeUnit.MILLISECONDS);  // Timeout per batch
     } catch (TimeoutException e) {
         log.warn("Batch processing timeout, pausing consumer");
         // Implement pause/resume logic
@@ -1519,9 +1658,12 @@ private void processRecords(List<ConsumerRecord<String, String>> records) {
     });
 }
 ```
+
 - **Rebalance Prevention Strategies**
 - Dynamic Poll Interval Adjustment
+
 ```java
+
 @Scheduled(fixedRate = 30000)
 public void adjustPolling() {
     long lag = getConsumerLag();
@@ -1534,14 +1676,17 @@ public void adjustPolling() {
     }
 }
 ```
+
 - Health Check Endpoint
+
 ```java
+
 @RestController
 public class HealthController {
-    
+
     @Autowired
     private KafkaListenerEndpointRegistry registry;
-    
+
     @GetMapping("/health")
     public ResponseEntity<String> health() {
         registry.getListenerContainers().forEach(container -> {
@@ -1553,7 +1698,9 @@ public class HealthController {
     }
 }
 ```
+
 - Monitor Configuration
+
 ```yaml
 management:
   endpoints:
@@ -1570,26 +1717,37 @@ management:
 
 ## 8. Your Spring Boot application processes sensitive data from a Kafka topic. How would you implement encryption and decryption for messages in Kafka to ensure data security?
 
-- To secure sensitive data in Kafka, you can implement end-to-end encryption by encrypting messages before sending them to Kafka and decrypting them upon consumption. 
-- Additionally, use SSL/TLS for secure communication between producers, consumers, and Kafka brokers. The Java Cryptography Extension (JCE) can be used for message-level encryption and decryption.
+- To secure sensitive data in Kafka, you can implement end-to-end encryption by encrypting messages before sending them
+  to Kafka and decrypting them upon consumption.
+- Additionally, use SSL/TLS for secure communication between producers, consumers, and Kafka brokers. The Java
+  Cryptography Extension (JCE) can be used for message-level encryption and decryption.
 
 - **Steps to Implement Encryption and Decryption**
 - **Message-Level Encryption (Producer Side)**
-- Encrypt sensitive data before sending it to Kafka using a symmetric encryption algorithm like AES (available in JCE). This ensures that the message payload is encrypted and unreadable by unauthorized parties, even if intercepted.
+- Encrypt sensitive data before sending it to Kafka using a symmetric encryption algorithm like AES (available in JCE).
+  This ensures that the message payload is encrypted and unreadable by unauthorized parties, even if intercepted.
 - **Message-Level Decryption (Consumer Side)**
-Decrypt the messages on the consumer side using the same symmetric key and algorithm. Store the encryption key securely (e.g., in AWS Secrets Manager or a Kubernetes secret).
+  Decrypt the messages on the consumer side using the same symmetric key and algorithm. Store the encryption key
+  securely (e.g., in AWS Secrets Manager or a Kubernetes secret).
 - **SSL/TLS for Transport Security**
-Configure Kafka to use SSL/TLS for secure communication between producers, consumers, and brokers. This protects data in transit and ensures authentication of the Kafka brokers.
+  Configure Kafka to use SSL/TLS for secure communication between producers, consumers, and brokers. This protects data
+  in transit and ensures authentication of the Kafka brokers.
 - **Key Management**
-Use a secure key management system (e.g., AWS Secrets Manager, HashiCorp Vault, or Kubernetes secrets) to store and retrieve encryption keys. Avoid hardcoding keys in the application code.
+  Use a secure key management system (e.g., AWS Secrets Manager, HashiCorp Vault, or Kubernetes secrets) to store and
+  retrieve encryption keys. Avoid hardcoding keys in the application code.
 - **Error Handling and Logging**
-Implement robust error handling for encryption/decryption failures and avoid logging sensitive data. Use logging to track encryption-related issues without exposing plaintext.
+  Implement robust error handling for encryption/decryption failures and avoid logging sensitive data. Use logging to
+  track encryption-related issues without exposing plaintext.
 
 Implementation:
-- Below is an example of implementing message-level encryption/decryption using AES with JCE and configuring SSL/TLS for Kafka in a Spring Boot application.
+
+- Below is an example of implementing message-level encryption/decryption using AES with JCE and configuring SSL/TLS for
+  Kafka in a Spring Boot application.
 
 ### **1.Encryption/Decryption Utility**
+
 - Create a utility class for AES encryption and decryption:
+
 ```java
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -1618,7 +1776,9 @@ public class CryptoUtil {
     }
 }
 ```
-- In a production environment, replace the hardcoded SECRET_KEY with a key retrieved from a secure key management system (e.g., AWS Secrets Manager). 
+
+- In a production environment, replace the hardcoded SECRET_KEY with a key retrieved from a secure key management
+  system (e.g., AWS Secrets Manager).
 
 ```java
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
@@ -1634,8 +1794,11 @@ public class CryptoUtil {
     }
 }
 ```
+
 ### **2.Producer Configuration with SSL**
+
 - Configure the Kafka producer with SSL and integrate encryption
+
 ```java
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -1675,8 +1838,11 @@ public class KafkaProducerConfig {
     }
 }
 ```
+
 ### **3. Producer Service with Encryption**
+
 - Implement a service to encrypt and send messages
+
 ```java
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -1706,10 +1872,13 @@ public class KafkaProducerService {
     }
 }
 ```
+
 -
 
 ### **4. Consumer Configuration with SSL**
+
 - Configure the consumer with SSL and integrate decryption
+
 ```java
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -1756,7 +1925,9 @@ public class KafkaConsumerConfig {
 ```
 
 ### **5. Consumer Implementation with Decryption**
+
 - Implement a @KafkaListener to decrypt and process messages
+
 ```java
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -1790,7 +1961,9 @@ public class KafkaConsumerService {
     }
 }
 ```
+
 - A simple database service for saving processed messages
+
 ```java
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -1814,6 +1987,7 @@ public class DatabaseService {
 interface MyEntityRepository extends JpaRepository<MyEntity, Long> {
 }
 ```
+
 - **Application Properties**
 - Configure Kafka (with SSL) and database settings in application.yml
 
@@ -1858,9 +2032,12 @@ spring:
 ```
 
 ### **6. Kafka Cluster SSL Configuration**
+
 - To enable SSL in the Kafka cluster:
-- Generate Certificates: Create a Java Keystore (JKS) for the truststore and keystore using tools like keytool or OpenSSL.
+- Generate Certificates: Create a Java Keystore (JKS) for the truststore and keystore using tools like keytool or
+  OpenSSL.
 - Configure Brokers: Update the Kafka broker configuration (server.properties) with SSL settings
+
 ```properties
 security.protocol=SSL
 ssl.keystore.location=/path/to/kafka.keystore.jks
@@ -1871,6 +2048,7 @@ ssl.truststore.password=truststore-password
 ```
 
 - Kubernetes: Store SSL certificates and encryption keys as Kubernetes secrets and mount them to the application pods:
+
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -1885,22 +2063,51 @@ data:
   key-password: <base64-encoded-password>
   ```
 
-  ## 9. Kafka guarantees order only within a single partition. How do you ensure global order or per-key order when the topic has many partitions and the app runs clustered?
+## 9. Kafka guarantees order only within a single partition. How do you ensure global order or per-key order when the topic has many partitions and the app runs clustered?
 
-  ### **1. Decide the real ordering requirement**
-| Scope                      | Design                                                               |
-| -------------------------- | -------------------------------------------------------------------- |
-| **Global order** (rare)    | Single partition (limits throughput)                                 |
-| **Per-key order** (common) | Same key → same partition via **key-hash** or **custom partitioner** |
+### **1. Decide the real ordering requirement**
+
+| **Scope**                  | **Design**                                                           |
+|----------------------------|----------------------------------------------------------------------|
+| **Global order (rare)**    | Single partition (limits throughput)                                 |
+| **Per-key order (common)** | Same key → same partition via **key-hash** or **custom partitioner** |
 
 ### **2. Per-key strict ordering – the canonical pattern**
+
 #### **2.1 Producer – use key as partition key**
+
 ```java
-kafkaTemplate.send("orders", order.getCustomerId(), order);
+package com.example.kafka.producer;
+
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+
+@Service
+public class OrderProducer {
+
+    private final KafkaTemplate<String, Order> kafkaTemplate;
+
+    public OrderProducer(KafkaTemplate<String, Order> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
+
+    public void sendOrder(Order order) {
+
+        // customerId is used as the key → determines partition
+        kafkaTemplate.send(
+                "orders",
+                order.getCustomerId(),   // partition key
+                order                   // value
+        );
+    }
+}
 ```
+
 - Kafka’s DefaultPartitioner hashes customerId → deterministic partition.
 - Same customer always lands on the same partition.
+
 #### **2.2 Consumer – one thread per partition**
+
 ```yaml
 spring:
   kafka:
@@ -1909,15 +2116,19 @@ spring:
     listener:
       concurrency: 6   # must match number of partitions
 ```
+
 - Each pod instance gets N partitions, each handled by exactly one thread → per-key order preserved.
+
 ### **3. When key-space is too large → partition key extraction
+
 - Create a partition key from the natural key
-| Business key | Partition key       | Example                       |
-| ------------ | ------------------- | ----------------------------- |
-| `customerId` | `customerId % 1000` | `"cust-42"` → partition 42    |
-| `orderId`    | first 4 chars       | `"ORD-1234"` → partition 1234 |
+  | Business key | Partition key | Example |
+  | ------------ | ------------------- | ----------------------------- |
+  | `customerId` | `customerId % 1000` | `"cust-42"` → partition 42 |
+  | `orderId`    | first 4 chars | `"ORD-1234"` → partition 1234 |
 
 #### **3.1 Custom partitioner**
+
 ```java
 public class CustomerPartitioner implements Partitioner {
     @Override
