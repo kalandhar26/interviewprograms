@@ -1,0 +1,10 @@
+
+`
+java:S1854">Remove this useless assignment to local variable "inputArray".(Ÿõû¿ùÿÿÿÿ8ïÉÊšŸ1
+Q
+java:S1481"/Remove this unused "inputArray" local variable.(Ÿõû¿ùÿÿÿÿ8ğÉÊšŸ1
+U	java:S106"9Replace this use of System.out or System.err by a logger.(¾áìŠ8ğÉÊšŸ1
+U	java:S106$"9Replace this use of System.out or System.err by a logger.(¿êÅ¢8ñÉÊšŸ1
+U	java:S106+"9Replace this use of System.out or System.err by a logger.(–®Ï¹8òÉÊšŸ1
+M
+java:S1128"0Remove this unused import 'java.util.ArrayList'.(÷‰îƒ8šËšŸ1

@@ -1,0 +1,42 @@
+# Kubernetes Manifests with Kustomize
+
+The following table outlines the purpose, functionality, and common use cases for each file and folder in the Kubernetes
+manifest structure using Kustomize. This structure serves as an alternative to Helm for managing microservices
+deployments in a Kubernetes environment, such as AWS EKS.
+
+| File/Folder                                    | Purpose & What it Does                                                                                                                 | Common Use Cases & Notes                                                                                             |
+|------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| **k8s/**                                       | Root directory containing raw Kubernetes manifests organized with Kustomize for base and environment-specific configurations.          | Centralizes Kubernetes manifests, enabling modular and environment-specific deployments without Helm.                |
+| **k8s/base/**                                  | Directory containing base Kubernetes manifests that define the core configuration for a microservice.                                  | Provides reusable, environment-agnostic manifests that are customized via overlays.                                  |
+| **k8s/base/kustomization.yaml**                | Kustomize configuration file that references base manifests (e.g., deployment, service, configmap, secret).                            | Defines the base resources and serves as the foundation for environment-specific overlays.                           |
+| **k8s/base/deployment.yaml**                   | Defines the Kubernetes Deployment for the microservice, specifying pods, images, replicas, environment variables, and resource limits. | Core deployment configuration, customized for environments via patches. Supports rolling updates.                    |
+| **k8s/base/service.yaml**                      | Defines a Kubernetes Service to route traffic to pods for stable networking and service discovery within the cluster.                  | Enables communication between microservices or exposure via ingress. Consistent across environments.                 |
+| **k8s/base/configmap.yaml**                    | Stores non-sensitive configuration data (e.g., URLs, feature flags) for the microservice, injected as environment variables or files.  | Allows configuration changes without rebuilding images. Customized per environment via patches.                      |
+| **k8s/base/secret.yaml**                       | Stores sensitive data (e.g., passwords, API keys, certificates) for the microservice, securely mounted or injected into pods.          | Prevents sensitive data leaks. Base secrets can be overridden or extended in overlays.                               |
+| **k8s/overlays/**                              | Directory containing environment-specific overlay configurations for dev, staging, and prod.                                           | Enables environment-specific customizations (e.g., replicas, resources, endpoints) without modifying base manifests. |
+| **k8s/overlays/dev/**                          | Directory containing Kustomize overlays for the development environment.                                                               | Customizes base manifests for development (e.g., lower resources, dev-specific endpoints).                           |
+| **k8s/overlays/dev/kustomization.yaml**        | Kustomize configuration file for the dev environment, referencing base manifests and applying patches.                                 | Specifies patches for dev-specific configurations and resources to apply.                                            |
+| **k8s/overlays/dev/configmap-patch.yaml**      | Patch file to override or extend the base ConfigMap for the dev environment (e.g., dev DB URLs, feature flags).                        | Allows dev-specific configuration without altering the base ConfigMap.                                               |
+| **k8s/overlays/dev/deployment-patch.yaml**     | Patch file to override or extend the base Deployment for the dev environment (e.g., fewer replicas, lower resources).                  | Customizes deployment settings for development, ensuring resource efficiency.                                        |
+| **k8s/overlays/staging/**                      | Directory containing Kustomize overlays for the staging/pre-prod environment.                                                          | Mimics production settings with tweaks for testing, ensuring reliable pre-prod validation.                           |
+| **k8s/overlays/staging/kustomization.yaml**    | Kustomize configuration file for the staging environment, referencing base manifests and applying patches.                             | Specifies patches for staging-specific configurations and resources to apply.                                        |
+| **k8s/overlays/staging/configmap-patch.yaml**  | Patch file to override or extend the base ConfigMap for the staging environment (e.g., staging DB URLs).                               | Ensures staging-specific configurations align closely with production.                                               |
+| **k8s/overlays/staging/deployment-patch.yaml** | Patch file to override or extend the base Deployment for the staging environment (e.g., production-like replicas).                     | Customizes deployment settings for staging, balancing testing and production readiness.                              |
+| **k8s/overlays/prod/**                         | Directory containing Kustomize overlays for the production environment.                                                                | Enforces production-grade settings for stability, scalability, and performance.                                      |
+| **k8s/overlays/prod/kustomization.yaml**       | Kustomize configuration file for the prod environment, referencing base manifests and applying patches.                                | Specifies patches for production-specific configurations and resources to apply.                                     |
+| **k8s/overlays/prod/configmap-patch.yaml**     | Patch file to override or extend the base ConfigMap for the production environment (e.g., prod DB URLs, feature flags).                | Ensures production-specific configurations are optimized for live use.                                               |
+| **k8s/overlays/prod/deployment-patch.yaml**    | Patch file to override or extend the base Deployment for the production environment (e.g., higher replicas, stricter resources).       | Customizes deployment settings for production, ensuring reliability and performance.                                 |
+| **k8s/overlays/prod/sealed-secret.yaml**       | Defines a SealedSecret for the production environment, encrypting sensitive data (e.g., passwords, API keys) using Sealed Secrets.     | Enhances security by encrypting secrets at rest, integrated with tools like Bitnami Sealed Secrets.                  |
+
+## Notes
+
+- This structure uses Kustomize as an alternative to Helm for managing Kubernetes manifests, providing a lightweight,
+  GitOps-friendly approach to customize deployments across environments.
+- **Base manifests** are environment-agnostic and reused across dev, staging, and prod via **overlays**, which apply
+  patches to tailor configurations (e.g., resource limits, endpoints).
+- **Sealed Secrets** in production enhance security by encrypting sensitive data, ensuring it’s not exposed in Git
+  repositories.
+- The structure integrates with a GitOps workflow (e.g., ArgoCD), where changes to manifests in a Git repository are
+  automatically synced to the Kubernetes cluster (AWS EKS).
+- For specific file examples (e.g., `kustomization.yaml`, `configmap-patch.yaml`), detailed artifacts can be provided
+  upon request, similar to those in prior responses.

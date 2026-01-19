@@ -1,0 +1,8 @@
+
+C
+java:S1481"&Remove this unused "x" local variable.(å™¯µ8Ñßô¯´1
+N	java:S106"9Replace this use of System.out or System.err by a logger.(Õñ‚—
+S	java:S106#"9Replace this use of System.out or System.err by a logger.(´‹¹öþÿÿÿÿ
+S	java:S106)"9Replace this use of System.out or System.err by a logger.(¾ùê¤üÿÿÿÿ
+Z
+java:S1128"8Remove this unused import 'java.util.stream.Collectors'.(Óóº´úÿÿÿÿ8Øßô¯´1

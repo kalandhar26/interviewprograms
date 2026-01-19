@@ -1,0 +1,15 @@
+
+_
+java:S1192"JDefine a constant instead of duplicating this literal "Economics" 3 times.(ú™Ý
+
+g
+java:S1192"LDefine a constant instead of duplicating this literal "Art History" 3 times.(áò­œÿÿÿÿÿ
+k
+java:S1192"PDefine a constant instead of duplicating this literal "Software Design" 3 times.(ß®·ýýÿÿÿÿ
+G
+java:S1481"1Remove this unused "enrollments2" local variable.(âôÁ¯
+G
+java:S1481""1Remove this unused "enrollments3" local variable.(—È°Œ
+G
+java:S1602+",Remove useless curly braces around statement(¹“Ž°ýÿÿÿÿ
+N	java:S106,"9Replace this use of System.out or System.err by a logger.(Ùœþº
