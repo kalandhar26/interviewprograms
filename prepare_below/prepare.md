@@ -1,0 +1,173 @@
+# Data Structures
+
+1. Arrays
+2. Strings
+3. Linked List
+4. Stacks
+5. Queues
+6. HashMaps
+7. Trees
+8. Heaps
+9. Graphs
+10. Tries
+11. Union Find
+
+# Algorithms
+
+1. Sorting
+2. Two Pointers
+3. Sliding Window
+4. Binary Search
+5. Recursion
+6. Greedy Algorithm
+7. Breadth First Search
+8. Depth First Search
+9. Topological Sorting
+10. Back Tracking
+11. Dynamic Programming
+
+# DSA Patterns:
+
+1. Two Pointers Pattern
+2. Sliding Window Pattern
+3. Binary Search
+4. Prefix Sum
+5. Fast and Slow Pointers
+6. Tree Traversal
+7. Breadth First Search
+8. Depth First Search
+9. Top 'K' elements
+10. Back Tracking
+11. Dynamic Programming.
+
+
+- Example 1
+  Graph:
+
+1. Vertices or Nodes.
+2. Edges.
+3. Undirected Graph.
+4. Directed Graph.
+5. cycles in a Graph.
+6. Directed acyclic graph. (DAG)
+7. Directed cyclic graph. (DCG)
+8. Path - contain lot of nodes and edges. each of them are reachable. A Node cannot appear twice in a path. If there is
+   no connectivity.
+9. Degrees - The number of edges going inside or coming outside of a node are called degree of node for an undirected
+   graph. Total degree of a graph is twice of numner of edges of a graph.
+10. Indegree and OutDegree - for Directed Graph. The number of incoming edges are called Indegree and The number of
+    outgoing edges are called Outdegree.
+11. Edge Weight: Every edge we will be having weight for every edge.
+
+Graph Representation | Java
+
+1.How the input of a graph is given to you?
+
+They will give us N and M. N is number of Nodes and numbers of Edges.
+[[1,2],[1,3],[3,4],[2,4],[2,5],[4,5]]
+
+2. Which data structure we use to store it?
+1. We will use AdjacencyMatrix (not used widely)
+2. We will use AdjacencyList ( widely used)
+
+3. Connected Components
+4. Any traversal we do, we will always use vistited array.
+
+Vistited array length up to 10 (N = 11)
+
+	for(i = 1 -> 10){
+		if(!vistited[i])
+			traverse(i);
+	}
+
+5. In Order to solve any graph problem we need to know traversal techniques.
+   5.1 Breadth First Search Traversal Technique. (Level wise Traversal Technique)
+    1. 1-based Indexing.
+    2. 0-based Indexing.
+
+Steps:
+
+1. Take a Queue data structure (FIFO) ( Why Queue)
+2. Visited Array ( Mark as 1 if vistited)  ( Which datastructure suits best to story visited nodes) boolean[] vis = new
+   boolean[v]; or set
+3. You go to starting point and ask for who are its neighbours.
+
+5.2 Depth First Search Traversal Technique.
+
+1. The algorithm that always goes to depth is recursion.
+
+Steps:
+
+1. Visited Array
+2. You call recursive dfs function
+3. for( auto it : adj[node])
+   if(!visited[it])
+   dfs(it)
+
+GraphUsingEdgeList{vertices=5,
+edges=[
+Edge{source=1, destination=2, weight=1},
+Edge{source=1, destination=3, weight=4},
+Edge{source=1, destination=4, weight=2},
+Edge{source=2, destination=4, weight=3},
+Edge{source=2, destination=5, weight=5},
+Edge{source=3, destination=4, weight=3},
+Edge{source=4, destination=5, weight=2}]}
+
+==============
+
+0 1 2 3 4 0 1 2 3 4 5 6
+
+0 1 3 2 4 0 1 3 2 4 5 6
+
+================================
+Topological Sorting:
+
+-> It only exists on Directed Acyclic Graph (DAG).
+-> It means any linear ordering of vertices such that if there is edge between u & v, u appears before v in that
+ordering.
+
+==================
+
+s = cadbzabcd
+
+We need to hashing technoque where we start from o to 255.
+
+int val = 'a' (97)
+
+for( i=0;i<n;i++{
+
+hash[256] = {0};
+
+	for(j=i;j<n;j++{
+		if(hash[s[j]] == 1)
+		break;
+		
+		length = j-i+1;
+		maxLen = max(maxLen, length);
+		 hash[s[j]] = 1;
+	}
+
+}
+
+====
+
+We need to optimize it. (use Two Pointer and Sliding Window)
+
+1. take 2 pointers (left and right)
+2. take hash (Map <Char, Index>
+3. maxLen =0;
+4. length = (right-left +1)
+
+
+1. Arrays
+2. Strings
+3. Stacks and Queues
+4. Two Pointers and Sliding Window
+5. Bit Manipulation
+6. Linked List
+7. Binary Search
+8. Dynamic Programming
+9. Graph
+10. Recursion
+11. Trie
