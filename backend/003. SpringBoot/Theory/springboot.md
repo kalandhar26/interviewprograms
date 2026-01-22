@@ -883,3 +883,37 @@ public class SchedulerConfig implements SchedulingConfigurer {
 - Deploy: JAR/Docker, lazy init, no DevTools.
 - Test: Coverage, perf/load. Use CI/CD for resilience.
 
+### 101. How would you handle inter-service communication in a microservice architecture using springboot?
+
+- For simple and direct communication, I would use RestTemplate, which allows services to send requests and receive
+  responses like a two way conversation.
+- For more complex communication, I would use Feign, which is a declarative web service client. It allows you to define
+  interfaces and annotations to describe your service interactions, and Feign will handle the rest, including making the
+  HTTP requests and parsing the responses.
+- For asynchronous communication, where immediate responses are not necessary, I would use message brokers like RabbitMQ
+  and Kafka. They acts like community boards, where services can post messages that other services read and act upon
+  later. This approach ensures a robust, flexible communication system between microservices.
+
+### 102. Can you explain the caching mechanisms available in springboot?
+
+- Caching is a technique used to store data in a temporary location so that it can be quickly accessed later.
+- Spring Boot provides several caching mechanisms, including:
+    - In-memory caching: Spring Boot uses the SimpleCacheManager by default, which stores cache data in memory. This is
+      suitable for small-scale applications or for caching data that doesn't change frequently.
+    - Distributed caching: Spring Boot supports distributed caching using various technologies such as Redis, Memcached,
+      and Ehcache. These caching solutions store cache data in a shared location, making them suitable for large-scale
+      applications or for caching data that changes frequently.
+    - Caching with Redis: Redis is an in-memory data structure store that can be used as a database, cache, and message
+      broker. Spring Boot provides support for Redis caching using the Spring Data Redis library. To enable Redis
+      caching, you need to add the `spring-boot-starter-data-redis` dependency to your project and configure the Redis
+      connection details in your `application.properties` or `application.yml` file.
+
+#### Implementation
+
+- Add the caching dependency, like spring-boot-starter-cache
+- Add a '@EnableCaching' on main class to enable caching.
+- Create a cache configuration class to define cache settings.
+- Use '@Cacheable' annotation on methods whose results we wanted to cache them.
+- We can also customize cache behaviour with annotations like '@CacheEvict' and '@CachePut'
+- We can Spring provided cache manager implementations like ConcurrentMapCacheManager, CaffeineCacheManager, etc.
+- We can also use customized cache providers like (EhCache or HazelCast or Redis).
