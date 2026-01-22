@@ -2,9 +2,12 @@
 
 ## 1. Create React App
 
-- Create React App (CRA) is an official tool from the React team to bootstrap a new React project with zero configuration.
-- It sets up a development environment with Babel for transpiling JSX/ES6+, Webpack for bundling, and tools for testing/hot reloading.
-- As of React 18 (and into 2025), it's still viable but often supplemented or replaced by faster alternatives like Vite for new projects.
+- Create React App (CRA) is an official tool from the React team to bootstrap a new React project with zero
+  configuration.
+- It sets up a development environment with Babel for transpiling JSX/ES6+, Webpack for bundling, and tools for
+  testing/hot reloading.
+- As of React 18 (and into 2025), it's still viable but often supplemented or replaced by faster alternatives like Vite
+  for new projects.
 
 ```bash
 # Modern setup (recommended)
@@ -22,7 +25,8 @@ npx create-react-app my-app --template typescript
 ### 2.1 Components: The Building Blocks
 
 - **Functional Components (Always Use These)**
-- Functional components are JavaScript functions that return JSX (React elements). - They're the preferred way to define UI in modern React (post-hooks era), stateless by default but can manage state via hooks.
+- Functional components are JavaScript functions that return JSX (React elements). - They're the preferred way to define
+  UI in modern React (post-hooks era), stateless by default but can manage state via hooks.
 - In React 18, they support concurrent features like transitions.
 
 ```jsx
@@ -100,7 +104,8 @@ const Component = () => (
 
 ### 2.3 Props: Passing Data Down
 
-- Props (properties) are read-only data passed from parent to child components, like function arguments. They're immutable within the child.
+- Props (properties) are read-only data passed from parent to child components, like function arguments. They're
+  immutable within the child.
 
 ```jsx
 // Parent Component
@@ -137,7 +142,10 @@ function Profile({ user, showDetails = false }) {
 - Avoid prop drilling >3 levels (use Context)
 
 ### 2.4 State: Component Memory
-- State is mutable data managed within a component, triggering re-renders on update. useState is the hook for adding state to functional components, returning [value, setter].
+
+- State is mutable data managed within a component, triggering re-renders on update. useState is the hook for adding
+  state to functional components, returning [value, setter].
+
 #### useState Hook
 
 ```jsx
@@ -171,8 +179,10 @@ function Counter() {
   );
 }
 ```
+
 - useState and useEffect Hooks (Combined as Core Hooks)
-- useState manages local state (as above). useEffect handles side effects (e.g., API calls, subscriptions) after render, with dependency arrays for control. 
+- useState manages local state (as above). useEffect handles side effects (e.g., API calls, subscriptions) after render,
+  with dependency arrays for control.
 - In React 18, useEffect supports concurrent cleanup.
 
 - **When to Use State:**
@@ -238,6 +248,7 @@ function Form() {
 ```
 
 ### 2.6 Conditional Rendering
+
 - Rendering JSX based on conditions (e.g., if/else, ternaries) to show/hide elements dynamically.
 
 ```jsx
@@ -273,7 +284,9 @@ function UserStatus({ isLoggedIn, user }) {
 ```
 
 ### 2.7 Lists & Keys
-- Rendering arrays of elements with map(). key prop uniquely identifies items for efficient reconciliation (React 18 optimizes this with better diffing).
+
+- Rendering arrays of elements with map(). key prop uniquely identifies items for efficient reconciliation (React 18
+  optimizes this with better diffing).
 
 ```jsx
 function TodoList({ todos }) {
@@ -307,7 +320,10 @@ function generateKey(item) {
 - Keys help React identify which items changed
 
 ### 2.8 Forms
-- Handling user input with uncontrolled (DOM-managed) or controlled (state-managed) components. Controlled is preferred for validation/sync.
+
+- Handling user input with uncontrolled (DOM-managed) or controlled (state-managed) components. Controlled is preferred
+  for validation/sync.
+
 ```jsx
 import { useState } from "react";
 
@@ -367,10 +383,14 @@ function SignupForm() {
   );
 }
 ```
+
 - For complex forms: Use React Hook Form library
 
 ## Composition vs Inheritance
-- Composition builds components by combining smaller ones (preferred); inheritance uses class extension (discouraged, leads to tight coupling).
+
+- Composition builds components by combining smaller ones (preferred); inheritance uses class extension (discouraged,
+  leads to tight coupling).
+
 ```jsx
 function Dialog({ title, children }) {
   return (
@@ -384,7 +404,11 @@ function Dialog({ title, children }) {
 ```
 
 ## Higher-Order Components (HOCs) – Function returning enhanced component.
-- A Higher-Order Component (HOC) is a function that takes a component as an argument and returns a new, enhanced component. It's a pattern in React for reusing component logic, such as adding props, state, or behavior (e.g., authentication, data fetching, logging) without modifying the original component. HOCs promote composition over inheritance, making code more modular and testable.
+
+- A Higher-Order Component (HOC) is a function that takes a component as an argument and returns a new, enhanced
+  component. It's a pattern in React for reusing component logic, such as adding props, state, or behavior (e.g.,
+  authentication, data fetching, logging) without modifying the original component. HOCs promote composition over
+  inheritance, making code more modular and testable.
 
 - Basic HOC for Adding Props (withLogging)
 - This HOC logs render events and injects a static prop.
@@ -416,7 +440,8 @@ function App() {
 ```
 
 - HOC with State and Effects (withDataFetching)
-- This HOC fetches data on mount and passes it as props. Uses useState and useEffect for a functional approach (modern React 18 style).
+- This HOC fetches data on mount and passes it as props. Uses useState and useEffect for a functional approach (modern
+  React 18 style).
 
 ```jsx
 import React, { useState, useEffect } from 'react';
