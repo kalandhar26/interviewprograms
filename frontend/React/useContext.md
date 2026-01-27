@@ -1,81 +1,55 @@
-# useConext
+# useContext
 
-- Picture a family where Mom's favorite color (like "blue") needs to be shared with everyone in the house without
-  yelling it from room to room. useContext is like a family newsletter that magically delivers the color to every kid's
-  room, so everyone knows without asking Mom over and over.
+- Imagine you are in a big classroom. Teacher has some important announcements. Instead of telling each student one by
+  one, the teacher shouts in the room
+- Everyone hears it immediately. In React, useContext is like that classroom announcement.
+- It lets data flow to multiple components without passing it through every single intermediate component (no “parent →
+  child → grandchild” hassle).
+- useContext is a React Hook that allows function components to consume context values. Context provides a way to share
+  data globally across the component tree without passing props down manually at every level.
+- It is often used for:
+- Theme settings
+- User authentication info
+- Language preferences
+- Global application state
 
-## Professional definition:
-
-- useContext is a React Hook that consumes a context value created by createContext. It allows components to subscribe
-  to context changes without prop drilling, making global state (like themes or user auth) accessible deep in the
-  component tree.
-
-## PseudoCode:
-
-```text
-textCreate a context with default value
-Provide the context value higher up in the tree
-In child component:
-Consume the context
-When provider value changes, re-render consumers
-```
-
-## Easy Code Example:
+## createContext
 
 ```jsx
-jsximport React, { createContext, useContext } from 'react';
+import { createContext } from "react";
 
-const ThemeContext = createContext('light'); // Default theme
-
-function Button() {
-const theme = useContext(ThemeContext); // Gets current theme
-return <button className={theme}>Click me!</button>;
-}
-
-function App() {
-return (
-<ThemeContext.Provider value="dark">
-<Button />
-</ThemeContext.Provider>
-);
-}
+export const ThemeContext = createContext("light");
 ```
 
-## Complex Code Example:
+## provideContext
 
 ```jsx
-jsximport React, { createContext, useContext, useState } from 'react';
-
-const UserContext = createContext();
-
-function UserProfile() {
-const { user, setUser } = useContext(UserContext);
-return (
-<div>
-<p>Hello, {user.name}!</p>
-<button onClick={() => setUser({ ...user, name: 'New Name' })}>
-Update Name
-</button>
-</div>
-);
-}
-
-function LoginButton() {
-const { user, setUser } = useContext(UserContext);
-return (
-<button onClick={() => setUser({ name: 'Logged In User', id: 123 })}>
-{user.id ? 'Logout' : 'Login'}
-</button>
-);
-}
+import { ThemeContext } from "./ThemeContext";
 
 function App() {
-const [user, setUser] = useState({ name: 'Guest', id: null });
-return (
-<UserContext.Provider value={{ user, setUser }}>
-<LoginButton />
-<UserProfile />
-</UserContext.Provider>
-);
+  return (
+    <ThemeContext.Provider value="dark">
+      <Toolbar />
+    </ThemeContext.Provider>
+  );
 }
 ```
+
+## Consume Context in Child Component
+
+```jsx
+import { useContext } from "react";
+import { ThemeContext } from "./ThemeContext";
+
+function Toolbar() {
+  const theme = useContext(ThemeContext);
+  return <h2>Current Theme: {theme}</h2>;
+}
+```
+
+# Important Rules (Interview Must-Know)
+
+- Always wrap consuming components inside a Provider
+- useContext only reads the current context value
+- Changes in context trigger re-render of consuming components
+- Avoid unnecessary context usage for performance-critical parts

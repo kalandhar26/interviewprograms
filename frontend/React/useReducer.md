@@ -1,55 +1,76 @@
 # useReducer
 
-- Managing a bunch of toys in different boxes (like colors, sizes, and favorites) can be chaotic if you move them one by
-  one. useReducer is like a boss who listens to your commands ("add red toy" or "remove big ones") and updates all the
-  boxes in one smart plan, so nothing gets lost in the shuffle.
+- Imagine you have a video game controller 🎮. Every time you press a button, something happens: move, jump, shoot
+- The game decides what to do based on the button pressed. The controller doesn’t store the game state — it just sends
+  instructions
+- The game engine updates the state and shows it on the screen
+- In React, useReducer is like the game engine:
+- State → the current situation of the game
+- Action → instructions (like button presses)
+- Reducer → decides how state changes based on the action
+- This is perfect when state logic is complex or has multiple sub-values.
 
-## Professional definition:
+## Professional definition
 
-- useReducer is a React Hook for managing complex state logic using a reducer function. It takes a reducer and initial
-  state, returning the current state and a dispatch function. It's similar to Redux but local to components, ideal for
-  state with multiple sub-values or transitions.
-
-## PseudoCode:
+- useReducer is a React Hook used for managing complex state logic in function components.
+- useReducer is a hook for managing complex state logic using a reducer function that takes the current state and an action to return a new state.
+- **It is an alternative to useState when:**
+- State transitions are complicated
+- New state depends on the previous state
+- Multiple sub-values need to be updated together
+- useReducer follows the reducer pattern:
 
 ```text
-textDefine reducer: (currentState, action) => newState
-Initialize with initialState
-Dispatch action: { type: 'ACTION_TYPE', payload: data }
-Reducer checks action.type and updates state accordingly
-Re-render with new state
+newState = reducer(currentState, action)
 ```
 
 ## Easy Code Example:
 
 ```jsx
-jsximport React, { useReducer } from 'react';
+import { useReducer } from "react";
 
-const initialState = { count: 0 };
-
+// Step 1: Define reducer function
 function reducer(state, action) {
-switch (action.type) {
-case 'increment':
-return { count: state.count + 1 };
-case 'decrement':
-return { count: state.count - 1 };
-default:
-return state;
-}
+  switch (action.type) {
+    case "increment":
+      return { count: state.count + 1 };
+    case "decrement":
+      return { count: state.count - 1 };
+    case "reset":
+      return { count: 0 };
+    default:
+      return state;
+  }
 }
 
+// Step 2: Use reducer in component
 function Counter() {
-const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, { count: 0 });
 
-return (
-<div>
-Count: {state.count}
-<button onClick={() => dispatch({ type: 'increment' })}>+</button>
-<button onClick={() => dispatch({ type: 'decrement' })}>-</button>
-</div>
-);
+  return (
+    <div>
+      <h2>Count: {state.count}</h2>
+      <button onClick={() => dispatch({ type: "increment" })}>+</button>
+      <button onClick={() => dispatch({ type: "decrement" })}>-</button>
+      <button onClick={() => dispatch({ type: "reset" })}>Reset</button>
+    </div>
+  );
 }
+
+export default Counter;
+
 ```
+
+- state → current state
+- dispatch → function to send actions
+- reducer → pure function deciding new state
+
+## Important Rules (Interview Must-Know)
+
+- Reducer must be a pure function (no side effects)
+- Always use dispatch to update state, never mutate state directly
+- Ideal for complex state or multiple related values
+- Can be combined with useContext for global state
 
 ## Complex Code Example:
 

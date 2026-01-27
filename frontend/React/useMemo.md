@@ -1,48 +1,53 @@
 # useMemo
 
-- Doing hard math homework every time your friend asks "What's 5 x 7?" is tiring. useMemo is like writing the answer on
-  a sticky note and only recalculating if the numbers change—like if it becomes 6 x 7. It saves your brain power for fun
-  stuff!
+- Imagine you have a magic notebook.You solve a hard math problem.You write the answer in the notebook
+- Next time you need the answer, you just read it instead of recalculating.
+- In React, useMemo is like that notebook. It remembers the result of a calculation and reuses it, instead of doing it
+  again on every render.
+- This makes your app faster and smarter.
 
-## Professional definition:
+=====================
 
-useMemo is a React Hook that memoizes a value by recomputing it only when one of its dependencies has changed. It's used
-to optimize performance by avoiding expensive calculations on every render.
-
-## PseudoCode:
-
-```text
-textDefine dependencies (e.g., [num])
-If any dependency changed since last render:
-Recalculate the value
-Else:
-Reuse the cached value
-Return the value
-```
-
-## Easy Code Example:
+- useMemo is a React Hook that memorizes (caches) the result of a computation. It recomputes the value only when its
+  dependencies change, helping to optimize performance by avoiding expensive calculations on every render.
+- useMemo is a hook that caches the result of a computation and recomputes it only when dependencies change to improve
+  performance.
 
 ```jsx
-jsximport React, { useState, useMemo } from 'react';
+import { useState, useMemo } from "react";
 
-function ExpensiveCounter() {
-const [num, setNum] = useState(5);
-const [other, setOther] = useState(0);
+function ExpensiveCalculation({ number }) {
+  const [count, setCount] = useState(0);
 
-const doubleNum = useMemo(() => {
-console.log('Calculating double...'); // Logs only when num changes
-return num * 2;
-}, [num]); // Depends only on num
+  // Memoize heavy calculation
+  const factorial = useMemo(() => {
+    console.log("Calculating factorial...");
+    const calculateFactorial = (n) => {
+      return n <= 1 ? 1 : n * calculateFactorial(n - 1);
+    };
+    return calculateFactorial(number);
+  }, [number]);
 
-return (
-<div>
-<p>Double: {doubleNum}</p>
-<button onClick={() => setNum(num + 1)}>Add to num</button>
-<button onClick={() => setOther(other + 1)}>Add to other (no effect)</button>
-</div>
-);
+  return (
+    <div>
+      <h2>Factorial of {number} is {factorial}</h2>
+      <button onClick={() => setCount(count + 1)}>Re-render {count}</button>
+    </div>
+  );
 }
+
+export default ExpensiveCalculation;
 ```
+
+- useMemo only recalculates when number changes
+- Clicking the button to increment count doesn’t redo the factorial calculation
+
+## Important Rules
+
+- Use useMemo for expensive calculations
+- Don’t overuse; small computations don’t need memoization
+- Dependencies array is mandatory
+- Returns memoized value, not a function
 
 ## Complex Code Example:
 

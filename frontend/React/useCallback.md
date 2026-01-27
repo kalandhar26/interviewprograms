@@ -1,57 +1,53 @@
 # useCallback
 
-- Every time your sibling asks you to high-five, you don't need to learn a whole new high-five move—useCallback
-  remembers your favorite high-five style and only updates it if you add a spin or something new. It keeps things fast
-  so your game doesn't lag from re-learning moves.
+- Imagine you have a toy robot that can perform tasks.You tell it, “Do this task.”
+- If you repeat the same instructions, the robot wastes time thinking again.
+- Instead, you give it a pre-written instruction card. Every time, it just reads the card and performs the task
+  instantly.
+- In React, useCallback is like that pre-written instruction card.
+- It remembers a function and only recreates it when needed, so the app doesn’t waste time on unnecessary re-renders.
+- useCallback is a React Hook that memorizes a function. It returns a memoized version of the callback function that
+  only changes if its dependencies change.
+- It is useful to prevent unnecessary re-renders of child components that rely on function props.
+- useCallback is a hook that memorizes a function to prevent unnecessary re-creations and re-renders of child components.
 
-## Professional definition:
+##
 
-- useCallback is a React Hook that returns a memoized callback function that only changes if one of its dependencies has
-  changed. It's used to optimize child components that rely on function props, preventing unnecessary re-renders.
-
-## PseudoCode:
-
-```text
-textDefine function and dependencies
-If dependencies changed:
-Create new function instance
-Else:
-Return the same cached function
-Pass the memoized function as prop
-```
-
-## Easy Code Example:
+- increment function is memoized
+- Button won’t re-render unnecessarily if parent re-renders, because increment reference stays the same
 
 ```jsx
-jsximport React, { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 
-function List({ items, onItemClick }) {
-console.log('List rendered'); // Only logs when items change, not onItemClick
-return (
-<ul>
-{items.map((item, i) => (
-<li key={i} onClick={() => onItemClick(item)}>{item}</li>
-))}
-</ul>
-);
+function Button({ handleClick }) {
+  console.log("Button rendered");
+  return <button onClick={handleClick}>Click Me</button>;
 }
 
 function App() {
-const [items, setItems] = useState(['apple', 'banana']);
-const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0);
 
-const handleClick = useCallback((item) => {
-console.log('Clicked:', item);
-}, []); // No deps: same function always
+  const increment = useCallback(() => {
+    setCount((prev) => prev + 1);
+  }, []); // function stays same unless dependencies change
 
-return (
-<div>
-<List items={items} onItemClick={handleClick} />
-<button onClick={() => setCount(count + 1)}>Count: {count}</button> {/* Doesn't re-render List */}
-</div>
-);
+  return (
+    <div>
+      <h2>Count: {count}</h2>
+      <Button handleClick={increment} />
+    </div>
+  );
 }
+
+export default App;
 ```
+
+## Important Rules (Interview Must-Know)
+
+- useCallback(fn, deps) → memoizes fn
+- Use when passing functions to child components
+- Avoid using it for functions that don’t affect performance
+- Dependencies array is mandatory
 
 ## Complex Code Example:
 
