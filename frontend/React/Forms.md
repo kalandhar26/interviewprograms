@@ -1,9 +1,12 @@
 # Formik
 
-# React HookForm
+- Formik is a popular React form library that simplifies form state management, validation, error handling, and
+  submission by abstracting repetitive boilerplate code using hooks or components.
 
-### 2.8 Forms
+## What are Forms in React?
 
+- Forms are used to collect user input like: Text (name, email), Numbers, Checkboxes, Radio buttons, Dropdowns
+- In React, form elements don’t manage their own state — React does.
 - Handling user input with uncontrolled (DOM-managed) or controlled (state-managed) components. Controlled is preferred
   for validation/sync.
 
