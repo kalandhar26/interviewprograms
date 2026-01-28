@@ -34,7 +34,8 @@ function UserForm() {
 }
 ```
 
-- **New React 18 Features:**
+# New React 18 Features:
+
 - **Automatic Batching:** Multiple state updates batched
 - **Transitions:** Mark updates as non-urgent
 - **Suspense for Data Fetching:** Better loading states
